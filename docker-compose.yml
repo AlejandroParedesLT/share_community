@@ -14,11 +14,13 @@ services:
     ports:
       - "8001:8001"
     depends_on:
-      - db
+      - postgres_db
+      # - oracle_db
+      # - mongo_db
     env_file:
       - .env
 
-  db:
+  postgres_db:
     image: postgres:15
     container_name: postgres_db
     restart: always
@@ -29,9 +31,57 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - .data/postgres:/var/lib/postgresql/data
 
-  # frontend:
+  # oracle_db:
+  #   image: container-registry.oracle.com/database/express:21.3.0-xe
+  #   container_name: oracle_db
+  #   restart: always
+  #   environment:
+  #     ORACLE_SID: XE
+  #     ORACLE_PDB: XEPDB1
+  #     ORACLE_PWD: myoraclepassword
+  #   ports:
+  #     - "1521:1521"
+  #     - "5500:5500"
+  #   volumes:
+  #     - oracle_data:/opt/oracle/oradata
+  #   healthcheck:
+  #     test: ["CMD", "sqlplus", "-L", "sys/myoraclepassword@//localhost:1521/XEPDB1", "as", "sysdba", "exit"]
+  #     interval: 30s
+  #     retries: 5
+  #     start_period: 60s
+  #     timeout: 10s
+
+  # mongo_db:
+  #   image: mongo:6
+  #   container_name: mongo_db
+  #   restart: always
+  #   environment:
+  #     MONGO_INITDB_ROOT_USERNAME: mongouser
+  #     MONGO_INITDB_ROOT_PASSWORD: mongopassword
+  #     MONGO_INITDB_DATABASE: mymongodb
+  #   ports:
+  #     - "27017:27017"
+  #   volumes:
+  #     - mongo_data:/data/db
+
+  frontend_react:
+    build:
+      context: ./frontend/reactFrontendSocialMedia
+      dockerfile: Dockerfile
+      args:
+        TARGET_ENV: ${FRONTEND_ENV}
+    container_name: frontend_WebReact
+    ports:
+      - "${FRONTEND_PORT}:5173"
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend/reactFrontendSocialMedia:/app
+      - /app/node_modules
+
+  # frontend_reactNative:
   #   build:
   #     context: ./frontend
   #     dockerfile: Dockerfile
@@ -48,3 +98,5 @@ services:
 
 volumes:
   postgres_data:
+  oracle_data:
+  mongo_data:
