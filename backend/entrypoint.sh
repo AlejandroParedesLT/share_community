@@ -28,5 +28,10 @@ else:
     print("Superuser already exists.")
 EOF
 
+python manage.py makemigrations socialmedia
+python manage.py migrate socialmedia
+python manage.py showmigrations socialmedia
+
+
 echo "Starting Django server..."
 exec "$@"

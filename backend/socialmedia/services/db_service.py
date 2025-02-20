@@ -1,4 +1,7 @@
 from django.db import connection
+from models.items import *
+from models.users import *
+
 
 class SocialMediaDBService:
     """Handles calls to stored procedures for social media data."""
@@ -11,3 +14,4 @@ class SocialMediaDBService:
 
         # Return list of dictionaries
         return [{"id": row[0], "title": row[1], "content": row[2], "created_at": row[3]} for row in results]
+    
