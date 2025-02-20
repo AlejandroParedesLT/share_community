@@ -6,7 +6,7 @@ data/*
 
 frontend/reactNative
 
-
+.data
 ###############################
 # REACT
 # dependencies
