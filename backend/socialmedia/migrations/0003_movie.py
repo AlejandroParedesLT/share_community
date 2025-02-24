@@ -3,9 +3,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ("socialmedia", "0001_initial"),
-    ]
+    dependencies = [("socialmedia", "0001_initial"), ("movie", "0003_movie")]
 
     operations = [
         migrations.CreateModel(
