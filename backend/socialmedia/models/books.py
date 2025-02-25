@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.db import models
 
-class Books(models.Model):
+class Book(models.Model):
     precordsid = models.IntegerField()
     title = models.TextField(blank=True, null=True)
     author = models.TextField(blank=True, null=True)

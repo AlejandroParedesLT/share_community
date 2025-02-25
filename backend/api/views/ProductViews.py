@@ -5,7 +5,7 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
 from django.db.utils import IntegrityError
-from socialmedia.models import Audio, Book
+from socialmedia.models import Book
 import logging
 
 # Logging setup
@@ -56,7 +56,7 @@ class BookView(APIView):
 
             book = Book.objects.create(
                 title=title, author=author, genre=genre, releasedate=releasedate,
-                publisher=publisher, description=description
+                publisher=publisher, description=description, precordsid=precordsid
             )
 
             return Response({'error': '0', 'message': f'Book {book.title} created'}, status=201)
