@@ -16,7 +16,7 @@ logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(message)s",
 )
 
-class Genres(APIView):
+class Genre(APIView):
     """
     API View to handle CRUD operations for Genre objects
     """
