@@ -5,13 +5,19 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
 from django.db.utils import IntegrityError
-from socialmedia.models import Audio
+from socialmedia.models import Audio, Book, Movie, Genre, Country  # Ensure these models exist
+
 import logging
 
 # Logging setup
-log_file = './mlapi_logs.log'
-logging.basicConfig(filename=log_file, level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+log_file = "./mlapi_logs.log"
+logging.basicConfig(
+    filename=log_file,
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+)
 
+@permission_classes([IsAuthenticated])
 class AudioView(APIView):
     """
     API View to handle CRUD operations for Audio objects.
@@ -118,123 +124,467 @@ class AudioView(APIView):
             logging.error('Error deleting Audio record: %s', e)
             return Response({'error': '3', 'message': str(e)}, status=500)
 
+@permission_classes([IsAuthenticated])
+class BookView(APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self, request):
+        try:
+            product_id = request.query_params.get('id')
+            if not product_id:
+                return Response({'error': '1', 'message': 'Book ID is required'}, status=400)
 
-# #Alejandro Paredes La Torre
-# #Import necessary libraries
-# from rest_framework.decorators import api_view, authentication_classes, permission_classes
-# from rest_framework.authentication import SessionAuthentication, TokenAuthentication
-# from rest_framework.response import Response
-# from rest_framework.views import APIView
-# from rest_framework.response import Response
-# from rest_framework.permissions import IsAuthenticated, AllowAny
-# from rest_framework.decorators import permission_classes
+            book = get_object_or_404(Book, id=product_id)
 
-# from django.db import IntegrityError
-# from django.contrib.auth import get_user_model
-# from django.shortcuts import get_object_or_404
-# from django.contrib.auth.models import User
-# from django.db.utils import IntegrityError
+            book_data = {
+                'id': book.id,
+                'precordsid': book.precordsid,
+                'title': book.title,
+                'author': book.author,
+                'genre': book.genre,
+                'releasedate': book.releasedate,
+                'publisher': book.publisher,
+                'description': book.description,
+            }
+            return Response({'error': '0', 'message': 'Success', 'data': book_data}, status=200)
 
-# from socialmedia.models import Product, Event, Audio
+        except Exception as e:
+            logging.error('Error Request: %s', e)
+            return Response({'error': '2', 'message': str(e)}, status=500)
 
-# from datetime import datetime, date
-# import logging
-# # Setting up logging
-# log_file = './mlapi_logs.log'
-# logging.basicConfig(filename=log_file, level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+    def post(self, request):
+        try:
+            data = request.data
+            precordsid = data.get('precordsid')
+            title = data.get('title')
+            author = data.get('author')
+            genre = data.get('genre')
+            releasedate = data.get('releasedate', None)
+            publisher = data.get('publisher', '')
+            description = data.get('description', '')
+
+            if not title or not author or not genre:
+                return Response({'error': '1', 'message': 'Title, Author, and Genre are required'}, status=400)
+
+            book = Book.objects.create(
+                title=title, author=author, genre=genre, releasedate=releasedate,
+                publisher=publisher, description=description, precordsid=precordsid
+            )
+
+            return Response({'error': '0', 'message': f'Book {book.title} created'}, status=201)
+
+        except IntegrityError:
+            return Response({'error': '2', 'message': 'Book already exists'}, status=400)
+
+        except Exception as e:
+            logging.error('Error creating book: %s', e)
+            return Response({'error': '3', 'message': str(e)}, status=500)
+
+    def put(self, request):
+        try:
+            data = request.data
+            book_id = data.get('id')
+
+            if not book_id:
+                return Response({'error': '1', 'message': 'Book ID is required'}, status=400)
+
+            book = get_object_or_404(Book, id=book_id)
+
+            book.precordsid = data.get('precordsid', book.precordsid)
+            book.title = data.get('title', book.title)
+            book.author = data.get('author', book.author)
+            book.genre = data.get('genre', book.genre)
+            book.releasedate = data.get('releasedate', book.releasedate)
+            book.publisher = data.get('publisher', book.publisher)
+            book.description = data.get('description', book.description)
+
+            book.save()
+
+            return Response({'error': '0', 'message': f'Book {book.title} updated'}, status=200)
+
+        except Exception as e:
+            logging.error('Error updating book: %s', e)
+            return Response({'error': '3', 'message': str(e)}, status=500)
+
+    def delete(self, request):
+        try:
+            book_id = request.query_params.get('id')
+
+            if not book_id:
+                return Response({'error': '1', 'message': 'Book ID is required'}, status=400)
+
+            book = get_object_or_404(Book, id=book_id)
+            book.delete()
+
+            return Response({'error': '0', 'message': f'Book {book.title} deleted'}, status=200)
+
+        except Exception as e:
+            logging.error('Error deleting book: %s', e)
+            return Response({'error': '3', 'message': str(e)}, status=500)
 
 
-# @permission_classes([IsAuthenticated])
-# class AudioView(APIView):
-#     permission_classes = [IsAuthenticated]
+class MovieView(APIView):
+    """
+    API View to handle CRUD operations for Movie objects.
+    """
 
-#     def get(self, request):
-#         try:
-#             product_id = request.query_params.get('id')
-#             if not product_id:
-#                 return Response({'error': '1', 'message': 'Product ID is required'}, status=400)
+    permission_classes = [IsAuthenticated]  # ✅ Correct placement
 
-#             product = get_object_or_404(Audio, id=product_id)
+    def get(self, request):
+        try:
+            movie_id = request.query_params.get("id")
+            if not movie_id:
+                return Response(
+                    {"error": "1", "message": "Movie ID is required"}, status=400
+                )
 
-#             product_data = {
-#                 'id': product.id,
-#                 'precordsid': product.precordsid,
-#                 'name': product.name,
-#                 'releasedate': product.releasedate,
-#                 'description': product.description,
-#                 'category': product.category,
-#             }
-#             return Response({'error': '0', 'message': 'Success', 'data': product_data}, status=200)
+            movie = get_object_or_404(Movie, id=movie_id)
 
-#     # precordsid = models.IntegerField()
-#     # name = models.TextField(blank=True, null=True)
-#     # releasedate = models.DateField(null=True, blank=True)
-#     # description = models.TextField(blank=True, null=True)
-#     # category = models.CharField(max_length=100)
+            movie_data = {
+                "id": movie.id,
+                "precordsid": movie.precordsid,
+                "title": movie.title,
+                "release_date": movie.release_date,
+                "description": movie.description,
+                "genre": movie.genre,
+                "category": movie.category,
+            }
+            return Response(
+                {"error": "0", "message": "Success", "data": movie_data}, status=200
+            )
 
-#         except Exception as e:
-#             logging.error('Error Request: %s', e)
-#             return Response({'error': '2', 'message': str(e)}, status=500)
+        except Exception as e:
+            logging.error("Error fetching Movie record: %s", e)
+            return Response({"error": "2", "message": str(e)}, status=500)
 
-#     def post(self, request):
-#         try:
-#             data = request.data
-#             title = data.get('precordsid')
-#             category = data.get('category')
-#             release_date = data.get('releasedate')
-#             description = data.get('description', '')
+    def post(self, request):
+        """
+        Create a new Movie record.
+        """
+        try:
+            data = request.data
+            precordsid = data.get("precordsid")
+            title = data.get("title")
+            release_date = data.get("release_date", None)
+            description = data.get("description", "")
+            genre = data.get("genre", "")
+            category = data.get("category", "")
 
-#             if not title or not category:
-#                 return Response({'error': '1', 'message': 'Title and Category are required'}, status=400)
+            if not precordsid or not category:
+                return Response(
+                    {"error": "1", "message": "precordsid and category are required"},
+                    status=400,
+                )
 
-#             product = Product.objects.create(
-#                 title=title, category=category, release_date=release_date, description=description
-#             )
+            movie = Movie.objects.create(
+                precordsid=precordsid,
+                title=title,
+                release_date=release_date,
+                description=description,
+                genre=genre,
+                category=category,
+            )
 
-#             return Response({'error': '0', 'message': f'Product {product.title} created'}, status=201)
+            return Response(
+                {"error": "0", "message": f"Movie {movie.title} created"}, status=201
+            )
 
-#         except IntegrityError:
-#             return Response({'error': '2', 'message': 'Product already exists'}, status=400)
+        except IntegrityError:
+            return Response(
+                {"error": "2", "message": "Movie record already exists"}, status=400
+            )
 
-#         except Exception as e:
-#             logging.error('Error creating product: %s', e)
-#             return Response({'error': '3', 'message': str(e)}, status=500)
+        except Exception as e:
+            logging.error("Error creating Movie record: %s", e)
+            return Response({"error": "3", "message": str(e)}, status=500)
 
-#     def put(self, request):
-#         try:
-#             data = request.data
-#             product_id = data.get('id')
+    def put(self, request):
+        """
+        Update an existing Movie record.
+        """
+        try:
+            data = request.data
+            movie_id = data.get("id")
 
-#             if not product_id:
-#                 return Response({'error': '1', 'message': 'Product ID is required'}, status=400)
+            if not movie_id:
+                return Response(
+                    {"error": "1", "message": "Movie ID is required"}, status=400
+                )
 
-#             product = get_object_or_404(Product, id=product_id)
+            movie = get_object_or_404(Movie, id=movie_id)
 
-#             product.title = data.get('precordsid', product.title)
-#             product.category = data.get('category', product.category)
-#             product.release_date = data.get('releasedate', product.release_date)
-#             product.description = data.get('description', product.description)
+            movie.precordsid = data.get("precordsid", movie.precordsid)
+            movie.title = data.get("title", movie.title)
+            movie.release_date = data.get("release_date", movie.release_date)
+            movie.description = data.get("description", movie.description)
+            movie.genre = data.get("genre", movie.genre)
+            movie.category = data.get("category", movie.category)
 
-#             product.save()
+            movie.save()
 
-#             return Response({'error': '0', 'message': f'Product {product.title} updated'}, status=200)
+            return Response(
+                {"error": "0", "message": f"Movie {movie.title} updated"}, status=200
+            )
 
-#         except Exception as e:
-#             logging.error('Error updating product: %s', e)
-#             return Response({'error': '3', 'message': str(e)}, status=500)
+        except Exception as e:
+            logging.error("Error updating Movie record: %s", e)
+            return Response({"error": "3", "message": str(e)}, status=500)
 
-#     def delete(self, request):
-#         try:
-#             product_id = request.query_params.get('id')
+    def delete(self, request):
+        """
+        Delete a Movie record.
+        """
+        try:
+            movie_id = request.query_params.get("id")
 
-#             if not product_id:
-#                 return Response({'error': '1', 'message': 'Product ID is required'}, status=400)
+            if not movie_id:
+                return Response(
+                    {"error": "1", "message": "Movie ID is required"}, status=400
+                )
 
-#             product = get_object_or_404(Product, id=product_id)
-#             product.delete()
+            movie = get_object_or_404(Movie, id=movie_id)
+            movie.delete()
 
-#             return Response({'error': '0', 'message': f'Product {product.title} deleted'}, status=200)
+            return Response(
+                {"error": "0", "message": f"Movie {movie.title} deleted"}, status=200
+            )
 
-#         except Exception as e:
-#             logging.error('Error deleting product: %s', e)
-#             return Response({'error': '3', 'message': str(e)}, status=500)
+        except Exception as e:
+            logging.error("Error deleting Movie record: %s", e)
+            return Response({"error": "3", "message": str(e)}, status=500)
+
+class Genre(APIView):
+    """
+    API View to handle CRUD operations for Genre objects
+    """
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request): 
+        try:
+            genre_id = request.query_params.get("id")
+            if not genre_id:
+                return Response(
+                    {"error": "1", "message": "Genre ID is required"}, status=400
+                )
+            
+            genre = get_object_or_404(Genre, id=genre_id)
+
+            genre_data = {
+                "id": genre.id,
+                "name": genre.name,
+                "createdAt": genre.createdAt,
+            }
+            return Response(
+                {"error": "0", "message": "Success", "data": genre_data}, status=200
+            )
+        
+        except Exception as e:
+            logging.error("Error fetching Genre record: %s", e)
+            return Response({"error": "2", "message": str(e)}, status=500)
+        
+    def post(self, request):
+        """
+        Creating a new Genre record
+        """
+        try:
+            data = request.data
+            name = data.get("name")
+            createdAt = data.get("createdAt", None)
+
+            if not name:
+                return Response(
+                    {"error": "1", "message": "Genre name is required"},
+                    status=400,
+                )
+            
+            genre = Genre.objects.create(
+                name=name,
+                createdAt=createdAt,
+            )
+
+            return Response(
+                {"error": "0", "message": f"Genre {genre.name} created"}, status=201
+            )
+        
+        except IntegrityError:
+            return Response(
+                {"error": "2", "message": "Genre record already exists"}, status=400
+            )
+        
+        except Exception as e:
+            logging.error("Error creating Genre record: %s", e)
+            return Response({"error": "3", "message": str(e)}, status=500)
+        
+    def put(self, request):
+        """
+        Update an existing Genre record.
+        """
+        try:
+            data = request.data
+            genre_id = data.get("id")
+
+            if not genre_id:
+                return Response(
+                    {"error": "1", "message": "Genre ID is required"}, status=400
+                )
+            
+            genre = get_object_or_404(Genre, id=genre_id)
+
+            genre.name = data.get("name", genre.name)
+            genre.createdAt = data.get("createdAt", genre.createdAt)
+
+            genre.save()
+
+            return Response(
+                {"error": "0", "message": f"Genre {genre.name} updated"}, status=200
+            )
+        
+        except Exception as e:
+            logging.error("Error updating Genre record: %s", e)
+            return Response({"error": "3", "message": str(e)}, status=500)
+        
+    def delete(self, request):
+        """
+        Delete a Genre record
+        """
+        try:
+            genre_id = request.query_params.get("id")
+
+            if not genre_id:
+                return Response(
+                    {"error": "1", "message": "Genre ID is required"}, status=400
+                )
+            
+            genre = get_object_or_404(Genre, id=genre_id)
+            genre.delete()
+
+            return Response(
+                {"error": "0", "message": f"Genre {genre.name} deleted"}, status=200
+            )
+
+        except Exception as e:
+            logging.error("Error deleting Genre record: %s", e)
+            return Response({"error": "3", "message": str(e)}, status=500)
+
+
+class Country(APIView):
+    """
+    API View to handle CRUD operations for Country objects
+    """
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request): 
+        try:
+            country_id = request.query_params.get("id")
+            if not country_id:
+                return Response(
+                    {"error": "1", "message": "Country ID is required"}, status=400
+                )
+            
+            country = get_object_or_404(Country, id=country_id)
+
+            country_data = {
+                "id": country.id,
+                "name": country.name,
+                "lat": country.lat,
+                "lon": country.lon,
+                "region": country.region
+            }
+            return Response(
+                {"error": "0", "message": "Success", "data": country_data}, status=200
+            )
+        
+        except Exception as e:
+            logging.error("Error fetching Country record: %s", e)
+            return Response({"error": "2", "message": str(e)}, status=500)
+        
+    def post(self, request):
+        """
+        Creating a new Country record
+        """
+        try:
+            data = request.data
+            name = data.get("name")
+            lat = data.get("lat")
+            lon = data.get("lon")
+            region = data.get("region")
+
+            if not name:
+                return Response(
+                    {"error": "1", "message": "Country name is required"},
+                    status=400,
+                )
+            
+            country = Country.objects.create(
+                name=name,
+                lat=lat,
+                lon=lon,
+                region=region
+            )
+
+            return Response(
+                {"error": "0", "message": f"Country {country.name} created"}, status=201
+            )
+        
+        except IntegrityError:
+            return Response(
+                {"error": "2", "message": "Country record already exists"}, status=400
+            )
+        
+        except Exception as e:
+            logging.error("Error creating Country record: %s", e)
+            return Response({"error": "3", "message": str(e)}, status=500)
+        
+    def put(self, request):
+        """
+        Update an existing Country record.
+        """
+        try:
+            data = request.data
+            country_id = data.get("id")
+
+            if not country_id:
+                return Response(
+                    {"error": "1", "message": "Country ID is required"}, status=400
+                )
+            
+            country = get_object_or_404(Country, id=country_id)
+
+            country.name = data.get("name", country.name)
+            country.lat = data.get("lat", country.lat)
+            country.lon = data.get("lon", country.lon)
+            country.region = data.get("region", country.region)
+
+            country.save()
+
+            return Response(
+                {"error": "0", "message": f"Country {country.name} updated"}, status=200
+            )
+        
+        except Exception as e:
+            logging.error("Error updating Country record: %s", e)
+            return Response({"error": "3", "message": str(e)}, status=500)
+        
+    def delete(self, request):
+        """
+        Delete a Country record
+        """
+        try:
+            country_id = request.query_params.get("id")
+
+            if not country_id:
+                return Response(
+                    {"error": "1", "message": "Country ID is required"}, status=400
+                )
+            
+            country = get_object_or_404(Country, id=country_id)
+            country.delete()
+
+            return Response(
+                {"error": "0", "message": f"Country {country.name} deleted"}, status=200
+            )
+
+        except Exception as e:
+            logging.error("Error deleting Country record: %s", e)
+            return Response({"error": "3", "message": str(e)}, status=500)
