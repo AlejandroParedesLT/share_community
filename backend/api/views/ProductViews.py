@@ -5,7 +5,7 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
 from django.db.utils import IntegrityError
-from socialmedia.models import Book, Movie, Genre, Country  # Ensure these models exist
+from socialmedia.models import Audio, Book, Movie, Genre, Country  # Ensure these models exist
 
 import logging
 
@@ -18,9 +18,115 @@ logging.basicConfig(
 )
 
 @permission_classes([IsAuthenticated])
+class AudioView(APIView):
+    """
+    API View to handle CRUD operations for Audio objects.
+    """
+    permission_classes = [IsAuthenticated]  # ✅ Correct placement
+
+    def get(self, request):
+        try:
+            product_id = request.query_params.get('id')
+            if not product_id:
+                return Response({'error': '1', 'message': 'Product ID is required'}, status=400)
+
+            audio = get_object_or_404(Audio, id=product_id)
+
+            product_data = {
+                'id': audio.id,
+                'precordsid': audio.precordsid,
+                'name': audio.name,
+                'releasedate': audio.releasedate,
+                'description': audio.description,
+                'category': audio.category,
+            }
+            return Response({'error': '0', 'message': 'Success', 'data': product_data}, status=200)
+
+        except Exception as e:
+            logging.error('Error fetching Audio record: %s', e)
+            return Response({'error': '2', 'message': str(e)}, status=500)
+
+    def post(self, request):
+        """
+        Create a new Audio record.
+        """
+        try:
+            data = request.data
+            precordsid = data.get('precordsid')
+            name = data.get('name', '')
+            releasedate = data.get('releasedate', None)
+            description = data.get('description', '')
+            category = data.get('category', '')
+
+            if not precordsid or not category:
+                return Response({'error': '1', 'message': 'precordsid and category are required'}, status=400)
+
+            audio = Audio.objects.create(
+                precordsid=precordsid,
+                name=name,
+                releasedate=releasedate,
+                description=description,
+                category=category
+            )
+
+            return Response({'error': '0', 'message': f'Audio {audio.name} created'}, status=201)
+
+        except IntegrityError:
+            return Response({'error': '2', 'message': 'Audio record already exists'}, status=400)
+
+        except Exception as e:
+            logging.error('Error creating Audio record: %s', e)
+            return Response({'error': '3', 'message': str(e)}, status=500)
+
+    def put(self, request):
+        """
+        Update an existing Audio record.
+        """
+        try:
+            data = request.data
+            audio_id = data.get('id')
+
+            if not audio_id:
+                return Response({'error': '1', 'message': 'Audio ID is required'}, status=400)
+
+            audio = get_object_or_404(Audio, id=audio_id)
+
+            audio.precordsid = data.get('precordsid', audio.precordsid)
+            audio.name = data.get('name', audio.name)
+            audio.releasedate = data.get('releasedate', audio.releasedate)
+            audio.description = data.get('description', audio.description)
+            audio.category = data.get('category', audio.category)
+
+            audio.save()
+
+            return Response({'error': '0', 'message': f'Audio {audio.name} updated'}, status=200)
+
+        except Exception as e:
+            logging.error('Error updating Audio record: %s', e)
+            return Response({'error': '3', 'message': str(e)}, status=500)
+
+    def delete(self, request):
+        """
+        Delete an Audio record.
+        """
+        try:
+            audio_id = request.query_params.get('id')
+
+            if not audio_id:
+                return Response({'error': '1', 'message': 'Audio ID is required'}, status=400)
+
+            audio = get_object_or_404(Audio, id=audio_id)
+            audio.delete()
+
+            return Response({'error': '0', 'message': f'Audio {audio.name} deleted'}, status=200)
+
+        except Exception as e:
+            logging.error('Error deleting Audio record: %s', e)
+            return Response({'error': '3', 'message': str(e)}, status=500)
+
+@permission_classes([IsAuthenticated])
 class BookView(APIView):
     permission_classes = [IsAuthenticated]
-
     def get(self, request):
         try:
             product_id = request.query_params.get('id')
