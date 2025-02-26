@@ -1,0 +1,257 @@
+{
+	"info": {
+		"_postman_id": "0bb1b8f4-e5e4-4b9c-8351-f665223a0c73",
+		"name": "Final_Proj_cs516",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "21314598"
+	},
+	"item": [
+		{
+			"name": "token",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "username",
+							"value": "admin",
+							"type": "default"
+						},
+						{
+							"key": "password",
+							"value": "adminpassword",
+							"type": "default"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:8001/api/token/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8001",
+					"path": [
+						"api",
+						"token",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "test",
+			"protocolProfileBehavior": {
+				"followAuthorizationHeader": false,
+				"strictSSL": false,
+				"followRedirects": false,
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQwMjQzMzA0LCJpYXQiOjE3NDAxNTY5MDQsImp0aSI6ImQxMDc0ZDc1MjgyODRlMjM4OTcxMTE4ZWNkZmYyMTVmIiwidXNlcl9pZCI6MX0.Eb3WtAgmOq1h6zqmibXd0sQEoYjkluNeRniTIpEVYO8",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "default"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzE1MjY1ODk2LCJpYXQiOjE3MTUxNzk0OTYsImp0aSI6IjA0YjdhNzUwZTUzNDQ1MDBiZDNlNmY1NjJlNjI2M2Q0IiwidXNlcl9pZCI6MX0.ycIVZCYoHG6wnWIEg8O10LuoLZjLzOaW8FrYXosjnM4",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"Alejandro\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/api/test_request/",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"api",
+						"test_request",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "product",
+			"protocolProfileBehavior": {
+				"followAuthorizationHeader": false,
+				"strictSSL": false,
+				"followRedirects": false
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQwMjQzMzA0LCJpYXQiOjE3NDAxNTY5MDQsImp0aSI6ImQxMDc0ZDc1MjgyODRlMjM4OTcxMTE4ZWNkZmYyMTVmIiwidXNlcl9pZCI6MX0.Eb3WtAgmOq1h6zqmibXd0sQEoYjkluNeRniTIpEVYO8",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "default"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzE1MjY1ODk2LCJpYXQiOjE3MTUxNzk0OTYsImp0aSI6IjA0YjdhNzUwZTUzNDQ1MDBiZDNlNmY1NjJlNjI2M2Q0IiwidXNlcl9pZCI6MX0.ycIVZCYoHG6wnWIEg8O10LuoLZjLzOaW8FrYXosjnM4",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"title\": \"Django unchained\",\r\n    \"category\": \"Action\",\r\n    \"release_date\": \"2024-01-01\",\r\n    \"description\": \"Movie about intense action and redemption\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/api/products/?id=1",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"api",
+						"products",
+						""
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "events",
+			"protocolProfileBehavior": {
+				"followAuthorizationHeader": false,
+				"strictSSL": false,
+				"followRedirects": false
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQwMTAwMDQ5LCJpYXQiOjE3NDAwMTM2NDksImp0aSI6ImIwOTYyNDdkMjUyMjRkODRhMzhkMWVjZDRiNmJhNWIyIiwidXNlcl9pZCI6MX0.MmADUaMErLYJf-Yez5nbxe5DxLUhuibPA7uAFCVTU80",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "default"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzE1MjY1ODk2LCJpYXQiOjE3MTUxNzk0OTYsImp0aSI6IjA0YjdhNzUwZTUzNDQ1MDBiZDNlNmY1NjJlNjI2M2Q0IiwidXNlcl9pZCI6MX0.ycIVZCYoHG6wnWIEg8O10LuoLZjLzOaW8FrYXosjnM4",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"user_id\": 1,\r\n    \"product_id\": 1,\r\n    \"timestamp\": \"2025-02-19\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/api/events/?id=1",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"api",
+						"events",
+						""
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "login_copy",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": []
+				},
+				"url": {
+					"raw": "{{url}}/admin",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"admin"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
