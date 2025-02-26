@@ -3,7 +3,7 @@ from django.db import models
 
 class Country(models.Model):
     precordsid = models.IntegerField()
-    id = models.IntegerField()
+    #id = models.IntegerField()
     name = models.TextField()
     lat = models.FloatField()
     lon = models.FloatField()

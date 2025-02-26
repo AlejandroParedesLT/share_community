@@ -3,7 +3,7 @@ from django.db import models
 
 class Genre(models.Model):
     precordsid = models.IntegerField()
-    id = models.IntegerField()
+    #id = models.IntegerField()
     name = models.CharField(max_length=100)
     createdAt = models.DateField()
 
