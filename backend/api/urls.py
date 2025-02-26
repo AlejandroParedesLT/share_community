@@ -1,5 +1,5 @@
 from django.urls import path
-from api.views import Test_Request, ProductView, EventView, index_page
+from api.views import Test_Request, ProductView, EventView, index_page, Genre, Country
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,  # Endpoint to get access & refresh tokens
     TokenRefreshView,  # Endpoint to refresh expired access tokens
@@ -13,6 +13,8 @@ urlpatterns = [
     #path('books/', views.books, name='books'),
     #path('movies/', views.movies, name='movies'),
     #path('audios/', views.audios, name='audios'),
+    path('genre/', Genre.as_view(), name = 'genre'),
+    path('country/', Country.as_view(), name = 'country'),
     path('test_request/', Test_Request.as_view(), name='test_request'),
     #path('products/', ProductView.as_view(), name='products'),
     path('events/', EventView.as_view(), name='events'),
