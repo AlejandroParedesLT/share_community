@@ -26,17 +26,6 @@ class Profile(models.Model):
         return self.user.username
 
 
-class Follower(models.Model):
-    follower = models.ForeignKey(User, on_delete=models.CASCADE, related_name="following")
-    following = models.ForeignKey(User, on_delete=models.CASCADE, related_name="followers")
-
-    class Meta:
-        unique_together = ('follower', 'following')
-
-    def __str__(self):
-        return f"{self.follower.username} follows {self.following.username}"
-
-
 class Message(models.Model):
     sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name="sent_messages")
     receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name="received_messages")
@@ -47,20 +36,36 @@ class Message(models.Model):
     def __str__(self):
         return f"{self.sender.username} -> {self.receiver.username}"
 
-class Product(models.Model):
-    title = models.CharField(max_length=255)
-    category = models.CharField(max_length=100)
-    release_date = models.DateField(null=True, blank=True)
-    description = models.TextField(blank=True, null=True)
-
-    def __str__(self):
-        return f"{self.title} ({self.get_category_display()})"
-
-
 class Event(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    precordsid = models.IntegerField()#on_delete=models.CASCADE)
     timestamp = models.DateTimeField(auto_now_add=True)  # When the user interacted with the product
 
     def __str__(self):
         return f"{self.user.username} - {self.product.title} ({self.timestamp})"
+    
+
+class Items(models.Model):
+    precordsid = models.AutoField(primary_key=True)  # Auto-incrementing integer primary key
+    typeid =models.IntegerField()
+    genreid = models.IntegerField()
+    title = models.CharField(max_length=255)
+    publish_date = models.DateTimeField()
+    
+    def __str__(self):
+        return f"{self.title} ({self.year}) - {self.genre}"
+
+    def __repr__(self):
+        return f"Movie(title={self.title}, year={self.year}, genre={self.genre})"
+    
+
+
+class Follower(models.Model):
+    follower = models.ForeignKey(User, on_delete=models.CASCADE, related_name="following")
+    following = models.ForeignKey(User, on_delete=models.CASCADE, related_name="followers")
+
+    class Meta:
+        unique_together = ('follower', 'following')
+
+    def __str__(self):
+        return f"{self.follower.username} follows {self.following.username}"
