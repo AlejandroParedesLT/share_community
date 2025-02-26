@@ -2,6 +2,7 @@ from django.db import models
 
 class Movie(models.Model):
     id = models.AutoField(primary_key=True)  # Auto-incrementing integer primary key
+    prid=models.IntegerField(foreign_key=True, on_delete=models.CASCADE)
     title = models.CharField(max_length=255)
     year = models.IntegerField()
     genre = models.CharField(max_length=100)
