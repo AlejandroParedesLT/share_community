@@ -18,7 +18,7 @@ class Migration(migrations.Migration):
                 ('name', models.TextField(blank=True, null=True)),
                 ('releasedate', models.DateField(blank=True, null=True)),
                 ('description', models.TextField(blank=True, null=True)),
-                ('category', models.CharField(max_length=100)),
+                ('category', models.CharField(max_length=100)), #genre vs category ? 
             ],
         ),
     ]
