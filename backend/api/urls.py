@@ -16,7 +16,7 @@ urlpatterns = [
     path('genre/', Genre.as_view(), name = 'genre'),
     path('country/', Country.as_view(), name = 'country'),
     path('test_request/', Test_Request.as_view(), name='test_request'),
-    path('products/', ProductView.as_view(), name='products'),
+    #path('products/', ProductView.as_view(), name='products'),
     path('events/', EventView.as_view(), name='events'),
     
     path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
