@@ -2,6 +2,7 @@ import { Redirect, Tabs } from 'expo-router';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { useAuth } from '../../providers/DjangoAuthProvider';
 import NotificationProvider from '../../providers/NotificationProvider';
+import { useNavigation } from '@react-navigation/native';
 
 export default function TabsLayout() {
   const { isAuthenticated } = useAuth();
@@ -24,22 +25,24 @@ export default function TabsLayout() {
         <Tabs.Screen
           name="index"
           options={{
-        headerTitle: 'Social',
-        headerTitleAlign: 'left',
-        headerRight: () => (
-          <FontAwesome
-            name="comments"
-            size={26}
-            color="white"
-            style={{ marginRight: 15, fontFamily: 'FontAwesome' }}
-            onPress={() => {
-          // Navigate to group messages page
-            }}
-          />
-        ),
-        tabBarIcon: ({ color }) => (
-          <FontAwesome name="home" size={26} color={color} />
-        ),
+            headerTitle: 'Social',
+            headerTitleAlign: 'left',
+            headerRight: () => {
+              const navigation = useNavigation();
+
+              return (
+                <FontAwesome
+                  name="comments"
+                  size={26}
+                  color="white"
+                  style={{ marginRight: 15, fontFamily: 'FontAwesome' }}
+                  onPress={() => navigation.navigate('chats')}
+                />
+              );
+            },
+            tabBarIcon: ({ color }) => (
+              <FontAwesome name="home" size={26} color={color} />
+            ),
           }}
         />
 
@@ -64,6 +67,7 @@ export default function TabsLayout() {
         ),
           }}
         />
+
       </Tabs>
     </NotificationProvider>
   );
