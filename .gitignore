@@ -4,8 +4,8 @@ data/*
 *.log
 *__pycache__/
 
-frontend/reactNative
-
+ref/
+temp
 .data
 ###############################
 # REACT

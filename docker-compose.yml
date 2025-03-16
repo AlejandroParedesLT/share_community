@@ -6,8 +6,10 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     container_name: django_backend
-    command: ["/app/entrypoint.sh", "gunicorn", "socialmedia.wsgi:application", "--bind", "0.0.0.0:8001"]
-
+    #command: ["/app/entrypoint.sh", "gunicorn", "socialmedia.wsgi:application", "--bind", "0.0.0.0:8001"]
+    command: ["/app/entrypoint.sh", "daphne", "-b", "0.0.0.0", "-p", "8001", "socialmedia.asgi:application"]
+    environment:
+      - DJANGO_SETTINGS_MODULE=socialmedia.settings  # ✅ Ensure settings are loaded
     # command: gunicorn config.wsgi:application --bind 0.0.0.0:8000
     volumes:
       - ./backend:/app
@@ -26,32 +28,12 @@ services:
     restart: always
     environment:
       POSTGRES_DB: mydatabase
-      POSTGRES_USER: myuser
-      POSTGRES_PASSWORD: mypassword
+      POSTGRES_USER: ${GLOBAL_USER}
+      POSTGRES_PASSWORD: ${GLOBAL_PASSWORD}
     ports:
       - "5431:5432"
     volumes:
       - ./data/postgres:/var/lib/postgresql/data
-
-  # oracle_db:
-  #   image: container-registry.oracle.com/database/express:21.3.0-xe
-  #   container_name: oracle_db
-  #   restart: always
-  #   environment:
-  #     ORACLE_SID: XE
-  #     ORACLE_PDB: XEPDB1
-  #     ORACLE_PWD: myoraclepassword
-  #   ports:
-  #     - "1521:1521"
-  #     - "5500:5500"
-  #   volumes:
-  #     - ./data/oracle:/opt/oracle/oradata
-  #   healthcheck:
-  #     test: ["CMD", "sqlplus", "-L", "sys/myoraclepassword@//localhost:1521/XEPDB1", "as", "sysdba", "exit"]
-  #     interval: 30s
-  #     retries: 5
-  #     start_period: 60s
-  #     timeout: 10s
 
   # mongo_db:
   #   image: mongo:6
@@ -96,7 +78,36 @@ services:
   #     - ./frontend:/app
   #     - /app/node_modules
 
+  minio:
+    image: minio/minio
+    container_name: minio
+    restart: always
+    ports:
+      - "9000:9000"   # MinIO API Port (S3-compatible)
+      - "9001:9001"   # MinIO Web UI
+    volumes:
+      - ./data/minio:/data
+    environment:
+      MINIO_ROOT_USER: ${GLOBAL_USER}  # Change this for production
+      MINIO_ROOT_PASSWORD: ${GLOBAL_PASSWORD}  # Change this for production
+      MINIO_ACCESS_KEY: minio
+      MINIO_SECRET_KEY: minio123
+    command: ["server", "/data", "--console-address", ":9001"]
+  minio-client:
+    image: minio/mc:latest
+    entrypoint: >
+      /bin/sh -c "
+      /usr/bin/mc config host rm expo;
+      /usr/bin/mc config host add --quiet --api s3v4 local http://minio:9000 minio minio123;
+      /usr/bin/mc rb --force local/<your-bucket-name>/;
+      /usr/bin/mc mb --quiet local/<your-bucket-name>/;
+      /usr/bin/mc policy set public local/<your-bucket-name>;
+      "
+    depends_on:
+      - minio
+
 volumes:
   postgres_data:
-  oracle_data:
-  mongo_data:
+  # oracle_data:
+  # mongo_data:
+  minio_data:

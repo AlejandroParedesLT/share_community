@@ -2659,6 +2659,14 @@
   dependencies:
     nanoid "3.3.8"
 
+"@react-navigation/stack@^7.1.2":
+  version "7.1.2"
+  resolved "https://registry.npmjs.org/@react-navigation/stack/-/stack-7.1.2.tgz"
+  integrity sha512-uRFec2SeZP7Urgekzake5AbWt1llsfxZdRqd9plOKnUTpSDhRO45d1XidgnB4eguJF4Yvdb8c2Ge3ZB3rvfCxg==
+  dependencies:
+    "@react-navigation/elements" "^2.2.6"
+    color "^4.2.3"
+
 "@remix-run/node@^2.12.0":
   version "2.16.0"
   resolved "https://registry.npmjs.org/@remix-run/node/-/node-2.16.0.tgz"
@@ -10636,7 +10644,7 @@ react-native-fs@^2.20.0:
     base-64 "^0.1.0"
     utf8 "^3.0.0"
 
-react-native-gesture-handler@>=2.9.0, react-native-gesture-handler@~2.20.2:
+"react-native-gesture-handler@>= 2.0.0", react-native-gesture-handler@>=2.9.0, react-native-gesture-handler@~2.20.2:
   version "2.20.2"
   resolved "https://registry.npmjs.org/react-native-gesture-handler/-/react-native-gesture-handler-2.20.2.tgz"
   integrity sha512-HqzFpFczV4qCnwKlvSAvpzEXisL+Z9fsR08YV5LfJDkzuArMhBu2sOoSPUF/K62PCoAb+ObGlTC83TKHfUd0vg==

@@ -12,52 +12,9 @@ export default function Auth() {
   const [loading, setLoading] = useState(false);
   const [username, setUsername] = useState('');
 
-  // async function signInWithEmail() {
-  //   setLoading(true);
-  //   try {
-  //     // Print environment variables to the console
-  //     console.log('This is a log from the env variables: ', process.env.REACT_APP_BACKEND_URL);
-  //     //const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/login/`, {
-  //     const response = await axios.post(`http://192.168.87.1:8001/api/login/`, {
-  //       username: username,
-  //       email: email,
-  //       password: password,
-  //     });
-  //     // Print the response to the console
-  //     console.log(response);
-  //     // If the response contains an error message, alert the user
-  //     if (response.data.error) {
-  //       Alert.alert(response.data.error);
-  //     }
-  //   } catch (error) {
-  //     Alert.alert('An error occurred during sign in');
-  //   }
-  //   setLoading(false);
-  // }
-
-  // async function signUpWithEmail() {
-  //   setLoading(true);
-  //   try {
-  //     //const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/user/`, {
-  //     const response = await axios.post(`http://192.168.87.1:8001/api/user/`, {
-  //       username: username,
-  //       email: email,
-  //       password: password,
-  //     });
-  //     if (response.data.error) {
-  //       Alert.alert(response.data.error);
-  //     } else {
-  //       Alert.alert('Please check your inbox for email verification!');
-  //     }
-  //   } catch (error) {
-  //     Alert.alert('An error occurred during sign up');
-  //   }
-  //   setLoading(false);
-  // }
-
   async function handleSignIn() {
     setLoading(true);
-    const success = await login(email, password);
+    const success = await login(username, password);
     if (!success) {
       Alert.alert('Login failed. Please check your credentials.');
     }
@@ -97,16 +54,7 @@ export default function Auth() {
           className="border border-gray-300 p-3 rounded-md"
         />
       </View>
-      <View style={[styles.verticallySpaced, styles.mt20]}>
-        <TextInput
-          onChangeText={(text) => setEmail(text)}
-          value={email}
-          placeholder="email@address.com"
-          autoCapitalize={'none'}
-          keyboardType="email-address"
-          className="border border-gray-300 p-3 rounded-md"
-        />
-      </View>
+
       <View style={styles.verticallySpaced}>
         <TextInput
           onChangeText={(text) => setPassword(text)}
@@ -151,3 +99,61 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
 });
+
+
+
+
+  // async function signInWithEmail() {
+  //   setLoading(true);
+  //   try {
+  //     // Print environment variables to the console
+  //     console.log('This is a log from the env variables: ', process.env.REACT_APP_BACKEND_URL);
+  //     //const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/login/`, {
+  //     const response = await axios.post(`http://192.168.87.1:8001/api/login/`, {
+  //       username: username,
+  //       email: email,
+  //       password: password,
+  //     });
+  //     // Print the response to the console
+  //     console.log(response);
+  //     // If the response contains an error message, alert the user
+  //     if (response.data.error) {
+  //       Alert.alert(response.data.error);
+  //     }
+  //   } catch (error) {
+  //     Alert.alert('An error occurred during sign in');
+  //   }
+  //   setLoading(false);
+  // }
+
+  // async function signUpWithEmail() {
+  //   setLoading(true);
+  //   try {
+  //     //const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/user/`, {
+  //     const response = await axios.post(`http://192.168.87.1:8001/api/user/`, {
+  //       username: username,
+  //       email: email,
+  //       password: password,
+  //     });
+  //     if (response.data.error) {
+  //       Alert.alert(response.data.error);
+  //     } else {
+  //       Alert.alert('Please check your inbox for email verification!');
+  //     }
+  //   } catch (error) {
+  //     Alert.alert('An error occurred during sign up');
+  //   }
+  //   setLoading(false);
+  // }
+
+
+      //   {/* <View style={[styles.verticallySpaced, styles.mt20]}>
+      //   <TextInput
+      //     onChangeText={(text) => setEmail(text)}
+      //     value={email}
+      //     placeholder="email@address.com"
+      //     autoCapitalize={'none'}
+      //     keyboardType="email-address"
+      //     className="border border-gray-300 p-3 rounded-md"
+      //   />
+      // </View> */}

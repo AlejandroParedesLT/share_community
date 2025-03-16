@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WebSocket Chat Test</title>
+    <style>
+        #messages { height: 300px; overflow-y: scroll; border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; }
+        .message { margin-bottom: 5px; }
+        .received { color: blue; }
+        .sent { color: green; text-align: right; }
+        .system { color: gray; font-style: italic; }
+    </style>
+</head>
+<body>
+    <h1>WebSocket Chat Test</h1>
+    
+    <div>
+        <label for="chatId">Chat ID:</label>
+        <input id="chatId" type="text" value="1">
+        
+        <label for="token">JWT Token:</label>
+        <input id="token" type="text" style="width: 300px;">
+        
+        <button onclick="connect()">Connect</button>
+        <span id="status">Disconnected</span>
+    </div>
+    
+    <div id="messages"></div>
+    
+    <div>
+        <input id="messageInput" type="text" placeholder="Type a message" style="width: 80%;">
+        <button onclick="sendMessage()">Send</button>
+    </div>
+    
+    <script>
+        let socket = null;
+        const messagesDiv = document.getElementById('messages');
+        const statusSpan = document.getElementById('status');
+        
+        function connect() {
+            const chatId = document.getElementById('chatId').value;
+            const token = document.getElementById('token').value;
+            
+            if (!token || !chatId) {
+                addMessage("Please enter both chat ID and token", "system");
+                return;
+            }
+            
+            // Close existing connection if any
+            if (socket) {
+                socket.close();
+            }
+            
+            statusSpan.textContent = "Connecting...";
+            statusSpan.style.color = "orange";
+            
+            // Create new connection
+            socket = new WebSocket(`ws://localhost:8001/ws/chat/${chatId}/`);
+            
+            socket.onopen = function() {
+                statusSpan.textContent = "Connected - Authenticating...";
+                addMessage("Connected to server, authenticating...", "system");
+                
+                // Send authentication message
+                socket.send(JSON.stringify({ 
+                    type: "authentication", 
+                    token: token 
+                }));
+            };
+            
+            socket.onmessage = function(event) {
+                const data = JSON.parse(event.data);
+                
+                if (data.type === "authentication") {
+                    if (data.status === "success") {
+                        statusSpan.textContent = "Authenticated";
+                        statusSpan.style.color = "green";
+                        addMessage("Authentication successful", "system");
+                    } else {
+                        statusSpan.textContent = "Auth Failed";
+                        statusSpan.style.color = "red";
+                        addMessage(`Authentication failed: ${data.message}`, "system");
+                    }
+                } else if (data.type === "chat_message") {
+                    // Display the message
+                    const messageText = `${data.sender}: ${data.message}`;
+                    const messageClass = data.sender === localStorage.getItem('username') ? 'sent' : 'received';
+                    addMessage(messageText, messageClass);
+                } else {
+                    addMessage(`Received: ${JSON.stringify(data)}`, "system");
+                }
+            };
+            
+            socket.onclose = function() {
+                statusSpan.textContent = "Disconnected";
+                statusSpan.style.color = "red";
+                addMessage("Connection closed", "system");
+            };
+            
+            socket.onerror = function(error) {
+                statusSpan.textContent = "Error";
+                statusSpan.style.color = "red";
+                addMessage(`WebSocket Error: ${error.message || "Unknown error"}`, "system");
+            };
+        }
+        
+        function sendMessage() {
+            if (!socket || socket.readyState !== WebSocket.OPEN) {
+                addMessage("Not connected", "system");
+                return;
+            }
+            
+            const messageInput = document.getElementById('messageInput');
+            const message = messageInput.value.trim();
+            
+            if (!message) {
+                return;
+            }
+            
+            socket.send(JSON.stringify({content: message}));
+            addMessage(`Me: ${message}`, "sent");
+            messageInput.value = '';
+        }
+        
+        function addMessage(text, className) {
+            const messageElement = document.createElement('div');
+            messageElement.className = `message ${className}`;
+            messageElement.textContent = text;
+            messagesDiv.appendChild(messageElement);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+        
+        // Allow pressing Enter to send messages
+        document.getElementById('messageInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+        
+        // Store username for message styling
+        function setUsername() {
+            const username = prompt("Enter your username (for message styling):");
+            if (username) {
+                localStorage.setItem('username', username);
+            }
+        }
+        
+        // Check if username is set
+        if (!localStorage.getItem('username')) {
+            setUsername();
+        }
+    </script>
+</body>
+</html>

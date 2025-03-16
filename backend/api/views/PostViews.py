@@ -1,0 +1,303 @@
+#Alejandro Paredes La Torre
+#Import necessary libraries
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from rest_framework.authentication import SessionAuthentication, TokenAuthentication
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated, AllowAny, IsAuthenticatedOrReadOnly
+from rest_framework.decorators import permission_classes
+from rest_framework.pagination import PageNumberPagination
+
+from django.db import IntegrityError
+from django.contrib.auth import get_user_model
+from django.shortcuts import get_object_or_404
+from django.contrib.auth.models import User
+from django.db.utils import IntegrityError
+from rest_framework import viewsets
+
+import logging
+# Setting up logging
+log_file = './userposts_logs.log'
+logging.basicConfig(filename=log_file, level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
+from socialmedia.models import (Event, 
+                                Item,
+                                Post,
+                                Follower,
+                                Comment,
+                                Like,
+                                Notification
+                                )
+
+from socialmedia.permissions import IsOwnerOrReadOnly  # Import the custom permission
+
+from socialmedia.serializers import (FollowerSerializer,
+                                      CommentSerializer,
+                                      LikeSerializer,
+                                      NotificationSerializer,
+                                      EventSerializer,
+                                      PostSerializer)
+
+User = get_user_model()
+
+class CustomItemPagination(PageNumberPagination):
+    page_size = 10  # Number of items per page
+    page_size_query_param = 'page_size'  # Allow dynamic page sizes
+    max_page_size = 50  # Limit max items per page
+
+class FollowerViewSet(viewsets.ModelViewSet):
+    queryset = Follower.objects.all()
+    serializer_class = FollowerSerializer
+    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
+
+class CommentViewSet(viewsets.ModelViewSet):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
+
+class LikeViewSet(viewsets.ModelViewSet):
+    queryset = Like.objects.all()
+    serializer_class = LikeSerializer
+    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
+
+class NotificationViewSet(viewsets.ModelViewSet):
+    queryset = Notification.objects.all()
+    serializer_class = NotificationSerializer
+    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
+
+class EventViewSet(viewsets.ModelViewSet):
+    queryset = Event.objects.all()
+    serializer_class = EventSerializer
+    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
+
+class CustomItemPagination(PageNumberPagination):
+    page_size = 10  # Number of items per page
+    page_size_query_param = 'page_size'  # Allow dynamic page sizes
+    max_page_size = 50  # Limit max items per page
+
+class PostViewSet(viewsets.ModelViewSet):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
+    pagination_class = CustomItemPagination
+    # def get_queryset(self):
+    #     limit = self.request.query_params.get('limit', 10)  # Default to 10 if not provided
+    #     return Post.objects.all().order_by('-created_at')[:int(limit)]
+
+
+############################
+###### REFERENCE FOR PAGINATION
+
+# class ItemViewSet(viewsets.ModelViewSet):
+#     serializer_class = ItemSerializer
+#     permission_classes = [IsAuthenticated]
+
+#     def get_queryset(self):
+#         limit = self.request.query_params.get('limit', 10)  # Default to 10 if not provided
+#         return Item.objects.all().order_by('-created_at')[:int(limit)]
+
+##########################
+#### Reference for pagination native
+
+# from rest_framework.pagination import PageNumberPagination
+
+# class ItemViewSet(viewsets.ModelViewSet):
+#     queryset = Item.objects.all().order_by('-created_at')
+#     serializer_class = ItemSerializer
+#     permission_classes = [IsAuthenticated]
+#     pagination_class = PageNumberPagination  # Enables pagination
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# class PostView(APIView):
+#     permission_classes = [IsAuthenticated]
+#     def get(self, request):
+#         try:
+#             post_id = request.query_params.get('id')
+#             if not post_id:
+#                 return Response({'error': '1', 'message': 'Post ID is required'}, status=400)
+
+#             post = get_object_or_404(Post, id=post_id)
+
+#             post_data = {
+#                 'id': post.id,
+#                 'title': post.title,
+#                 'content': post.content,
+#                 'created_at': post.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+#             }
+#             return Response({'error': '0', 'message': 'Success', 'data': post_data}, status=200)
+
+#         except Exception as e:
+#             logging.error('Error Request: %s', e)
+#             return Response({'error': '2', 'message': str(e)}, status=500)
+        
+#     def post(self, request):
+#         try:
+#             data = request.data
+#             user = request.user  # Authenticated user
+#             title = data.get('title')
+#             content = data.get('content')
+#             events_data = data.get('events', {})
+#             imageid= data.get('imageid')
+#             if not title or not content:
+#                 return Response({'error': '1', 'message': 'Missing required fields'}, status=400)
+
+#             post = Post.objects.create(user=user, title=title, content=content, imageid=imageid)
+
+#             # Attach Events to Post
+#             for event_id, event_data in events_data.items():
+#                 precords_id = event_data.get('precords_id')
+#                 timestamp = event_data.get('timestamp')
+
+#                 if not precords_id: #or not timestamp:
+#                     continue  # Skip invalid events
+
+#                 event = Event.objects.create(user=user, precordsid=precords_id, timestamp=timestamp)
+#                 post.events.add(event)
+
+#             return Response({'error': '0', 'message': f'Post {post.title} created successfully'}, status=201)
+
+#         except Exception as e:
+#             return Response({'error': '3', 'message': str(e)}, status=500)
+        
+#     def put(self, request):
+#         try:
+#             data = request.data
+#             post_id = data.get('id')
+
+#             if not post_id:
+#                 return Response({'error': '1', 'message': 'Post ID is required'}, status=400)
+            
+#             post = get_object_or_404(Post, id=post_id)
+
+#             title = data.get('title')
+#             content = data.get('content')
+
+#             if title:
+#                 post.title = title
+#             if content:
+#                 post.content = content
+
+#             post.save()
+
+#             return Response({'error': '0', 'message': 'Post updated'}, status=200)
+        
+#         except Exception as e:
+#             logging.error('Error updating post: %s', e)
+#             return Response({'error': '3', 'message': str(e)}, status=500)
+        
+#     def delete(self, request):
+#         try:
+#             post_id = request.query_params.get('id')
+
+#             if not post_id:
+#                 return Response({'error': '1', 'message': 'Post ID is required'}, status=400)
+            
+#             post = get_object_or_404(Post, id=post_id)
+#             post.delete()
+
+#             return Response({'error': '0', 'message': 'Post deleted'}, status=200)
+        
+#         except Exception as e:
+#             logging.error('Error deleting post: %s', e)
+#             return Response({'error': '3', 'message': str(e)}, status=500)
+
+
+
+
+# class EventView(APIView):
+#     permission_classes = [IsAuthenticated]
+#     def get(self, request):
+#         try:
+#             event_id = request.query_params.get('id')
+#             if not event_id:
+#                 return Response({'error': '1', 'message': 'Transaction ID is required'}, status=400)
+
+#             event = get_object_or_404(Event, id=event_id)
+
+#             event_data = {
+#                 'id': event.id,
+#                 'user': event.user.username,
+#                 'precordsid': event.precordsid,
+#                 # Create the timestamp serverside not 
+#                 'timestamp': event.timestamp.strftime('%Y-%m-%d %H:%M:%S'),
+#             }
+
+#             return Response({'error': '0', 'message': 'Success', 'data': event_data}, status=200)
+
+#         except Exception as e:
+#             logging.error('Error Request: %s', e)
+#             return Response({'error': '2', 'message': str(e)}, status=500)
+
+#     def post(self, request):
+#         try:
+#             data = request.data
+#             user_id = data.get('user_id')
+#             precords_id = data.get('precords_id')
+
+#             if not user_id or not precords_id:
+#                 return Response({'error': '1', 'message': 'User ID and Product ID are required'}, status=400)
+            
+#             user = get_object_or_404(User, id=user_id)
+#             item = get_object_or_404(Item, precordsid=precords_id)
+#             event = Event.objects.create(user=user, precordsid=item)
+            
+#             return Response({'error': '0', 'message': f'Transaction created for {user.username} - {item.title} on {event.timestamp}'}, status=201)
+#         except Exception as e:
+#             logging.error('Error creating transaction: %s', e)
+#             return Response({'error': '3', 'message': str(e)}, status=500)
+
+#     def put(self, request):
+#         try:
+#             data = request.data
+#             transaction_id = data.get('id')
+
+#             if not transaction_id:
+#                 return Response({'error': '1', 'message': 'Transaction ID is required'}, status=400)
+
+#             event = get_object_or_404(Event, id=transaction_id)
+
+#             user_id = data.get('user_id')
+#             product_id = data.get('product_id')
+
+#             if user_id:
+#                 event.user = get_object_or_404(User, id=user_id)
+#             if product_id:
+#                 item = get_object_or_404(Item, precordsid=product_id)
+#                 event.precordsid = item
+
+#             event.save()
+
+#             return Response({'error': '0', 'message': 'Transaction updated'}, status=200)
+
+#         except Exception as e:
+#             logging.error('Error updating transaction: %s', e)
+#             return Response({'error': '3', 'message': str(e)}, status=500)
+
+#     def delete(self, request):
+#         try:
+#             event_id = request.query_params.get('id')
+
+#             if not event_id:
+#                 return Response({'error': '1', 'message': 'Transaction ID is required'}, status=400)
+
+#             transaction = get_object_or_404(Event, id=event_id)
+#             transaction.delete()
+
+#             return Response({'error': '0', 'message': 'Transaction deleted'}, status=200)
+
+#         except Exception as e:
+#             logging.error('Error deleting transaction: %s', e)
+#             return Response({'error': '3', 'message': str(e)}, status=500)

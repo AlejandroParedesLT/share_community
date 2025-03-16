@@ -41,6 +41,7 @@ ALLOWED_HOSTS = os.environ['ALLOWED_HOSTS'].split(",")
 # Application definition
 
 INSTALLED_APPS = [
+    'daphne',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -51,7 +52,38 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'api',
     'socialmedia',
+    'channels',
+    "corsheaders",
 ]
+
+#     
+
+ASGI_APPLICATION = "socialmedia.asgi.application"
+CORS_ALLOW_ALL_ORIGINS = True # Allow all origins for testing
+# Channels Layer (Using Redis for message handling)
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer",  # Use Redis in production
+    },
+}
+
+# CHANNEL_LAYERS = {
+#     "default": {
+#         "BACKEND": "channels_redis.core.RedisChannelLayer",
+#         "CONFIG": {
+#             "hosts": [("127.0.0.1", 6379)],
+#         },
+#     },
+# }
+
+
+###########################################
+# Referebce for pagination
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 30  # Adjust as needed
+}
+###########################################
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -102,6 +134,7 @@ SIMPLE_JWT = {
 }
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -110,6 +143,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+# 
 
 ROOT_URLCONF = 'socialmedia.urls'
 
@@ -129,7 +163,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'socialmedia.wsgi.application'
+# WSGI_APPLICATION = 'socialmedia.wsgi.application'
 
 
 LOGGING = {
@@ -207,5 +241,36 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
+# Static files (CSS, JavaScript, Images)
 
+import os
+
+# Static files configuration
 STATIC_URL = '/static/'
+STATICFILES_LOCATION = 'static'
+STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
+# STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+
+# MinIO configuration (all from environment variables with defaults)
+MINIO_ENDPOINT = os.getenv('MINIO_ENDPOINT', 'localhost:9000')
+MINIO_ROOT_USER = os.getenv('MINIO_ROOT_USER', 'minioadmin')
+MINIO_ROOT_PASSWORD = os.getenv('MINIO_ROOT_PASSWORD', 'minioadmin')
+MINIO_BUCKET_NAME = os.getenv('MINIO_BUCKET_NAME', 'django-media')
+MINIO_SECURE = os.getenv('MINIO_SECURE', 'False').lower() == 'true'
+
+# For compatibility with S3 libraries (like django-storages)
+AWS_ACCESS_KEY_ID = MINIO_ROOT_USER
+AWS_SECRET_ACCESS_KEY = MINIO_ROOT_PASSWORD
+AWS_STORAGE_BUCKET_NAME = MINIO_BUCKET_NAME
+AWS_S3_ENDPOINT_URL = f"{'https' if MINIO_SECURE else 'http'}://{MINIO_ENDPOINT}"
+AWS_S3_CUSTOM_DOMAIN = f"{MINIO_ENDPOINT}/{MINIO_BUCKET_NAME}"
+AWS_DEFAULT_ACL = 'public-read'
+AWS_S3_OBJECT_PARAMETERS = {
+    'CacheControl': 'max-age=86400',
+}
+
+# Storage configuration
+DEFAULT_FILE_STORAGE = 'socialmedia.storage.S3MediaStorage'
+
+# Media URL for template references
+MEDIA_URL = f"{'https' if MINIO_SECURE else 'http'}://{MINIO_ENDPOINT}/{MINIO_BUCKET_NAME}/"

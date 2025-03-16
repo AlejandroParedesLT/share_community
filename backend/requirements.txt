@@ -36,3 +36,17 @@ pandas
 numpy
 
 Pillow
+
+minio
+
+django-storages
+
+boto3
+
+channels
+
+daphne
+
+channels-redis
+
+django-cors-headers

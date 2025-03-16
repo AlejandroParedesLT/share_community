@@ -1,2 +1,4 @@
-from .CoreViews import *
-from .ProductViews import *
+from .UserViews import *
+from .ItemViews import *
+from .ChatViews import *
+from .PostViews import *
