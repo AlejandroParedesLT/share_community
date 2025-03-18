@@ -1,11 +1,13 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 //import { API_URL } from '@env';
 //const API_URL = 'http://localhost:8001';
+import Constants from 'expo-constants';
+
 
 export const login = async (email: string, password: string) => {
   try {
-    //const response = await fetch(`${process.env.DJANGO_API_URL}/api/login/`, {
-    const response = await fetch(`http://192.168.87.1:8001/api/login/`, {
+    const response = await fetch(`${process.env.EXPO_PUBLIC_DJANGO_API_URL}/api/login/`, {
+    //const response = await fetch(`http://192.168.87.1:8001/api/login/`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username: email, password }),
@@ -39,8 +41,8 @@ export const refreshAccessToken = async () => {
   if (!refreshToken) return null;
 
   try {
-    //const response = await fetch(`${process.env.DJANGO_API_URL}/token/refresh/`, {
-    const response = await fetch(`http://192.168.87.1:8001/token/refresh/`, {
+    const response = await fetch(`${process.env.EXPO_PUBLIC_DJANGO_API_URL}/token/refresh/`, {
+    //const response = await fetch(`http://192.168.87.1:8001/token/refresh/`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ refresh: refreshToken }),

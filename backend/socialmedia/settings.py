@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'socialmedia',
     'channels',
     "corsheaders",
+    'storages',
 ]
 
 #     
@@ -252,18 +253,29 @@ STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
 # STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 
 # MinIO configuration (all from environment variables with defaults)
-MINIO_ENDPOINT = os.getenv('MINIO_ENDPOINT', 'localhost:9000')
-MINIO_ROOT_USER = os.getenv('MINIO_ROOT_USER', 'minioadmin')
-MINIO_ROOT_PASSWORD = os.getenv('MINIO_ROOT_PASSWORD', 'minioadmin')
-MINIO_BUCKET_NAME = os.getenv('MINIO_BUCKET_NAME', 'django-media')
-MINIO_SECURE = os.getenv('MINIO_SECURE', 'False').lower() == 'true'
+import os
 
-# For compatibility with S3 libraries (like django-storages)
+# MinIO Configuration
+MINIO_ENDPOINT = os.environb.get(b"MINIO_ENDPOINT", b"minio:9000").decode("utf-8")  # Default to `minio:9000`
+MINIO_ROOT_USER = os.environb.get(b"MINIO_ROOT_USER", 'minio').decode("utf-8")
+MINIO_ROOT_PASSWORD = os.environb.get(b'MINIO_ROOT_PASSWORD', 'minio123').decode("utf-8")
+MINIO_BUCKET_NAME = os.environb.get(b'MINIO_BUCKET_NAME', 'django-media').decode("utf-8")
+MINIO_SECURE = os.getenv('MINIO_SECURE', 'False').lower() == 'true'
+CUSTOM_AWS_S3_URL = os.environb.get(b'CUSTOM_AWS_S3_URL').decode("utf-8")
+CUSTOM_MINIO_URL_TARGET = os.environb.get(b'CUSTOM_MINIO_TARGET_URL').decode("utf-8")
+# Ensure MINIO_ENDPOINT does not contain extra protocol
+if MINIO_ENDPOINT.startswith("http://") or MINIO_ENDPOINT.startswith("https://"):
+    AWS_S3_ENDPOINT_URL = MINIO_ENDPOINT  # Keep as is if already full URL
+else:
+    AWS_S3_ENDPOINT_URL = f"{'https' if MINIO_SECURE else 'http'}://{MINIO_ENDPOINT}"
+    #AWS_S3_ENDPOINT_URL = MINIO_ENDPOINT
+
+# S3-Compatible Storage Settings
 AWS_ACCESS_KEY_ID = MINIO_ROOT_USER
 AWS_SECRET_ACCESS_KEY = MINIO_ROOT_PASSWORD
 AWS_STORAGE_BUCKET_NAME = MINIO_BUCKET_NAME
-AWS_S3_ENDPOINT_URL = f"{'https' if MINIO_SECURE else 'http'}://{MINIO_ENDPOINT}"
-AWS_S3_CUSTOM_DOMAIN = f"{MINIO_ENDPOINT}/{MINIO_BUCKET_NAME}"
+AWS_S3_CUSTOM_DOMAIN = f"{AWS_S3_ENDPOINT_URL}/{MINIO_BUCKET_NAME}"
+MINIO_ACCESS_URL = os.environb.get(b'MINIO_ACCESS_URL').decode("utf-8")
 AWS_DEFAULT_ACL = 'public-read'
 AWS_S3_OBJECT_PARAMETERS = {
     'CacheControl': 'max-age=86400',
@@ -273,4 +285,4 @@ AWS_S3_OBJECT_PARAMETERS = {
 DEFAULT_FILE_STORAGE = 'socialmedia.storage.S3MediaStorage'
 
 # Media URL for template references
-MEDIA_URL = f"{'https' if MINIO_SECURE else 'http'}://{MINIO_ENDPOINT}/{MINIO_BUCKET_NAME}/"
+MEDIA_URL = f"{AWS_S3_ENDPOINT_URL}/{MINIO_BUCKET_NAME}/"

@@ -64,6 +64,9 @@ urlpatterns = [
     path('books/', BookView.as_view(), name='books'),
     path("movies/", MovieView.as_view(), name="movies"),
     path('audio/', AudioView.as_view(), name='audios'),
+    
+    # Retrieve get_presigned_url
+    #path('get_presigned_url/', views.get_presigned_url, name='get_presigned_url'),
 
     # Posting routes
     path('', include(routerPostings.urls)),

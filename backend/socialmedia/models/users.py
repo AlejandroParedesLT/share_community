@@ -2,6 +2,8 @@ from django.contrib.auth import get_user_model
 from django.db import models
 # Delete the image from MinIO before deleting the model
 from socialmedia.utils.minio_utils import delete_file
+from socialmedia.storage import S3MediaStorage
+from socialmedia.models.images import hash_upload_path
 
 User = get_user_model()
 class Country(models.Model):
@@ -13,6 +15,8 @@ class Country(models.Model):
     def __str__(self):
         return self.name
 
+def item_image_upload_path(instance, filename):
+    return hash_upload_path(instance, filename, "profile_pictures")
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=255, blank=True, null=True)
@@ -20,8 +24,8 @@ class Profile(models.Model):
     bio = models.TextField(blank=True, null=True)
     country = models.ForeignKey(Country, on_delete=models.SET_NULL, null=True, blank=True)
     profile_picture = models.ImageField(
-        upload_to="profile_pics/", 
-        storage='socialmedia.storage.S3MediaStorage',  # Your MinIO storage class
+        upload_to=item_image_upload_path, 
+        storage=S3MediaStorage(),
         blank=True, 
         null=True
     )

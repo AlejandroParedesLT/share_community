@@ -17,6 +17,7 @@ services:
       - "8001:8001"
     depends_on:
       - postgres_db
+      - minio
       # - oracle_db
       # - mongo_db
     env_file:
@@ -88,26 +89,44 @@ services:
     volumes:
       - ./data/minio:/data
     environment:
-      MINIO_ROOT_USER: ${GLOBAL_USER}  # Change this for production
-      MINIO_ROOT_PASSWORD: ${GLOBAL_PASSWORD}  # Change this for production
-      MINIO_ACCESS_KEY: minio
-      MINIO_SECRET_KEY: minio123
+      MINIO_ROOT_USER: ${GLOBAL_USER}
+      MINIO_ROOT_PASSWORD: ${GLOBAL_PASSWORD}
+    env_file:
+      - .env
     command: ["server", "/data", "--console-address", ":9001"]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/ready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   minio-client:
     image: minio/mc:latest
+    depends_on:
+      minio:
+        condition: service_healthy
     entrypoint: >
       /bin/sh -c "
-      /usr/bin/mc config host rm expo;
-      /usr/bin/mc config host add --quiet --api s3v4 local http://minio:9000 minio minio123;
-      /usr/bin/mc rb --force local/<your-bucket-name>/;
-      /usr/bin/mc mb --quiet local/<your-bucket-name>/;
-      /usr/bin/mc policy set public local/<your-bucket-name>;
+      sleep 5;
+      /usr/bin/mc config host add --quiet --api s3v4 myminio http://minio:9000 ${GLOBAL_USER} ${GLOBAL_PASSWORD};
+      /usr/bin/mc mb --quiet myminio/django-media || true;
+      /usr/bin/mc policy set public myminio/django-media;
+      
+      # Create service account for application
+      /usr/bin/mc config host add --quiet --api s3v4 myminio http://minio:9000 ${GLOBAL_USER} ${GLOBAL_PASSWORD} || echo 'Host already exists';
+      /usr/bin/mc admin user add myminio ${AWS_ACCESS_KEY_ID} ${AWS_SECRET_ACCESS_KEY} || echo 'User already exists or user creation failed';
+      /usr/bin/mc admin policy set myminio readwrite user=${AWS_ACCESS_KEY_ID}  || echo 'Policy attached or user policy failed';
+      
+      echo 'MinIO setup completed successfully';
       "
-    depends_on:
-      - minio
+    env_file:
+      - .env
 
 volumes:
   postgres_data:
   # oracle_data:
   # mongo_data:
   minio_data:
+
+#MINIO_ACCESS_KEY: ${AWS_ACCESS_KEY_ID}
+#MINIO_SECRET_KEY: ${AWS_SECRET_ACCESS_KEY}

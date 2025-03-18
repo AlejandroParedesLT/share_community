@@ -1,6 +1,7 @@
 #Alejandro Paredes La Torre
 #Import necessary libraries
-from rest_framework.decorators import api_view, authentication_classes, permission_classes
+import os
+from rest_framework.decorators import api_view, authentication_classes, permission_classes # type: ignore
 from rest_framework.authentication import SessionAuthentication, TokenAuthentication
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -15,6 +16,7 @@ from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User
 from django.db.utils import IntegrityError
 from rest_framework import viewsets
+import urllib.parse
 
 import logging
 # Setting up logging
@@ -22,7 +24,6 @@ log_file = './userposts_logs.log'
 logging.basicConfig(filename=log_file, level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 from socialmedia.models import (Event, 
-                                Item,
                                 Post,
                                 Follower,
                                 Comment,
@@ -38,7 +39,8 @@ from socialmedia.serializers import (FollowerSerializer,
                                       NotificationSerializer,
                                       EventSerializer,
                                       PostSerializer)
-
+from socialmedia.storage import get_s3_client, get_custom_s3_client
+from django.conf import settings
 User = get_user_model()
 
 class CustomItemPagination(PageNumberPagination):
@@ -46,15 +48,13 @@ class CustomItemPagination(PageNumberPagination):
     page_size_query_param = 'page_size'  # Allow dynamic page sizes
     max_page_size = 50  # Limit max items per page
 
-class FollowerViewSet(viewsets.ModelViewSet):
-    queryset = Follower.objects.all()
-    serializer_class = FollowerSerializer
-    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
-
 class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
     permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
+    def perform_create(self, serializer):
+        """Set the user field to the authenticated user before saving."""
+        serializer.save(user=self.request.user)
 
 class LikeViewSet(viewsets.ModelViewSet):
     queryset = Like.objects.all()
@@ -70,6 +70,9 @@ class EventViewSet(viewsets.ModelViewSet):
     queryset = Event.objects.all()
     serializer_class = EventSerializer
     permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
+    def perform_create(self, serializer):
+        """Set the user field to the authenticated user before saving."""
+        serializer.save(user=self.request.user)
 
 class CustomItemPagination(PageNumberPagination):
     page_size = 10  # Number of items per page
@@ -81,10 +84,44 @@ class PostViewSet(viewsets.ModelViewSet):
     serializer_class = PostSerializer
     permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
     pagination_class = CustomItemPagination
+
+    def perform_create(self, serializer):
+        """Set the user field to the authenticated user before saving."""
+        serializer.save(user=self.request.user)
     # def get_queryset(self):
     #     limit = self.request.query_params.get('limit', 10)  # Default to 10 if not provided
     #     return Post.objects.all().order_by('-created_at')[:int(limit)]
 
+
+
+
+# @api_view(["GET"])
+# @permission_classes([IsAuthenticated])
+# def get_presigned_url(request):
+#     """Generate a pre-signed URL to access an image with correct object path."""
+#     object_name = request.query_params.get("object_name")  # Expecting full object path
+
+#     if not object_name:
+#         return Response({"error": "Missing object_name parameter"}, status=400)
+
+#     # Ensure object_name contains only the relative path
+#     parsed_url = urllib.parse.urlparse(object_name)
+#     object_key = parsed_url.path.lstrip("/")  # Extract path, remove leading slash
+
+#     try:
+#         # Generate the pre-signed URL
+#         presigned_url = s3.generate_presigned_url(
+#             "get_object",
+#             Params={"Bucket": settings.AWS_STORAGE_BUCKET_NAME, "Key": object_key},
+#             ExpiresIn=3600,  # URL valid for 1 hour
+#         )
+
+#         target_url=os.environb.get(b"TARGET_IP").decode("utf-8")
+#         fixed_url = presigned_url.replace("http://minio:9000", f"http://{target_url}:9000")
+
+#         return Response({"url": fixed_url})
+#     except Exception as e:
+#         return Response({"error": str(e)}, status=500)
 
 ############################
 ###### REFERENCE FOR PAGINATION

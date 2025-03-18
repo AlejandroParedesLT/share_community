@@ -1,6 +1,11 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 from .items import Item
+from socialmedia.models.images import hash_upload_path
+from django.conf import settings
+from socialmedia.storage import S3MediaStorage
+
+
 
 User = get_user_model()
 
@@ -11,12 +16,15 @@ class Event(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.item.title} ({self.timestamp})"
-  
+
+# Define a function wrapper to avoid serialization issues
+def post_image_upload_path(instance, filename):
+    return hash_upload_path(instance, filename, "post_images")
 class Post(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="posts")
     title = models.CharField(max_length=255)
     content = models.TextField(blank=True, null=True)
-    image = models.ImageField(upload_to="post_images/", blank=True, null=True)
+    image = models.ImageField(upload_to=post_image_upload_path, storage=S3MediaStorage(), blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     #events = models.ManyToManyField(Event, related_name="posts")
     items = models.ManyToManyField(Item, related_name="posts")

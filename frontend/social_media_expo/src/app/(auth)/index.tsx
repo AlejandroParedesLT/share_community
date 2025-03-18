@@ -4,6 +4,8 @@ import Button from '../../components/Button';
 //import { getAccessToken, refreshAccessToken, login, logout } from '../../lib/django';
 import { useAuth } from '../../providers/DjangoAuthProvider';
 import axios from 'axios';
+import Constants from 'expo-constants';
+
 
 export default function Auth() {
   const { login } = useAuth();
@@ -24,7 +26,12 @@ export default function Auth() {
   async function handleSignUp() {
     setLoading(true);
     try {
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/user/`, {
+      if (!Constants.expoConfig || !Constants.expoConfig.extra) {
+        Alert.alert('Configuration error', 'Backend URL is not properly configured.');
+        setLoading(false);
+        return;
+      }
+      const response = await fetch(`${Constants.expoConfig.extra.REACT_APP_BACKEND_URL}/api/user/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, email, password }),
