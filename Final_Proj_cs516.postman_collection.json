@@ -7,249 +7,1148 @@
 	},
 	"item": [
 		{
-			"name": "token",
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json",
-						"type": "default"
-					}
-				],
-				"body": {
-					"mode": "formdata",
-					"formdata": [
+			"name": "User",
+			"item": [
+				{
+					"name": "login",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "username",
+									"value": "admin",
+									"type": "default"
+								},
+								{
+									"key": "password",
+									"value": "adminpassword",
+									"type": "default"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{url}}/api/login/",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"login",
+								""
+							]
+						}
+					},
+					"response": [
 						{
-							"key": "username",
-							"value": "admin",
-							"type": "default"
+							"name": "loginPedro",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "default"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "username",
+											"value": "Pedro",
+											"type": "default"
+										},
+										{
+											"key": "password",
+											"value": "123456",
+											"type": "default"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{url}}/api/login/",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"api",
+										"login",
+										""
+									]
+								}
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
 						},
 						{
-							"key": "password",
-							"value": "adminpassword",
-							"type": "default"
+							"name": "loginRishika",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "default"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "username",
+											"value": "admin",
+											"type": "default"
+										},
+										{
+											"key": "password",
+											"value": "adminpassword",
+											"type": "default"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{url}}/api/login/",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"api",
+										"login",
+										""
+									]
+								}
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						},
+						{
+							"name": "loginShawn",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "default"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "username",
+											"value": "admin",
+											"type": "default"
+										},
+										{
+											"key": "password",
+											"value": "adminpassword",
+											"type": "default"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{url}}/api/login/",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"api",
+										"login",
+										""
+									]
+								}
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
 						}
 					]
 				},
+				{
+					"name": "user",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQxNzIzMzI1LCJpYXQiOjE3NDE2MzY5MjUsImp0aSI6IjM3NmUzYjIxNjYwYjRkNmY5ODAyN2RiY2VlZDU5MDZmIiwidXNlcl9pZCI6M30.aDGZ8A_iFRQk_1b-P_3W34lz5C15UVPovmjd_IeOHTM",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "default"
+							},
+							{
+								"key": "Authorization",
+								"value": "",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/api/user/?id=20",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"user",
+								""
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "20"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "signup",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "username",
+									"value": "Rishika",
+									"type": "default"
+								},
+								{
+									"key": "password",
+									"value": "123456",
+									"type": "default"
+								},
+								{
+									"key": "email",
+									"value": "rishika@gmail.com",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{url}}/api/user/",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"user",
+								""
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "signup",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "default"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "username",
+											"value": "Rishika",
+											"type": "default"
+										},
+										{
+											"key": "password",
+											"value": "123456",
+											"type": "default"
+										},
+										{
+											"key": "email",
+											"value": "rishika@gmail.com",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{url}}/api/user/",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"api",
+										"user",
+										""
+									]
+								}
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": null
+						}
+					]
+				},
+				{
+					"name": "update",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer your-access-token"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n           \"username\": \"john_updated\",\r\n           \"email\": \"john.new@example.com\",\r\n           \"password\": \"newsecurepassword\"\r\n         }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000/api/user/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"user",
+								""
+							]
+						},
+						"description": "Generated from cURL: curl -X PUT http://localhost:8000/api/user/ \\\r\n     -H \"Content-Type: application/json\" \\\r\n     -H \"Authorization: Bearer your-access-token\" \\\r\n     -d '{\r\n           \"username\": \"john_updated\",\r\n           \"email\": \"john.new@example.com\",\r\n           \"password\": \"newsecurepassword\"\r\n         }'\r\n"
+					},
+					"response": []
+				},
+				{
+					"name": "upload_image",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "username",
+									"value": "user_plusImage_v2",
+									"type": "text"
+								},
+								{
+									"key": "email",
+									"value": "test_v2@example.com",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "123456",
+									"type": "text"
+								},
+								{
+									"key": "bio",
+									"value": "This is my bio",
+									"type": "text"
+								},
+								{
+									"key": "profile_picture",
+									"type": "file",
+									"src": "/C:/Users/ALEJANDRO/Downloads/dogsjpeg.jpeg"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{url}}/api/profile/",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"profile",
+								""
+							]
+						},
+						"description": "Generated from cURL: curl -X POST -F \"username=testuser\" -F \"email=test@example.com\" -F \"password=securepassword\" -F \"bio=This is my bio\" -F \"profile_picture=@/path/to/image.jpg\" http://localhost:8000/api/users/"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Items",
+			"item": [
+				{
+					"name": "movies",
+					"protocolProfileBehavior": {
+						"followAuthorizationHeader": false,
+						"strictSSL": false,
+						"followRedirects": false
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQxMzk1NTIyLCJpYXQiOjE3NDEzMDkxMjIsImp0aSI6IjBkMjQyNWZiNzhjODQ1ZjRhZDIzODVkMTAyNDNkMGFjIiwidXNlcl9pZCI6MX0.dBSV7QVkerG1Ax8Bzd444Frh2k69AGoz2wkzYOW_Mq0",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "default"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzE1MjY1ODk2LCJpYXQiOjE3MTUxNzk0OTYsImp0aSI6IjA0YjdhNzUwZTUzNDQ1MDBiZDNlNmY1NjJlNjI2M2Q0IiwidXNlcl9pZCI6MX0.ycIVZCYoHG6wnWIEg8O10LuoLZjLzOaW8FrYXosjnM4",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"precordsid\":1,\r\n    \"title\": \"Django unchained\",\r\n    \"category\": \"Action\",\r\n    \"release_date\": \"2024-01-01\",\r\n    \"description\": \"Movie about intense action and redemption\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/api/movies/",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"movies",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "item_image",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQyMjYxMzQwLCJpYXQiOjE3NDIxNzQ5NDAsImp0aSI6IjcyNmU4OGRlNmJkNjRmYzRhYjI2NDczMmIwZjZkZWY3IiwidXNlcl9pZCI6Mn0.wpgCCdVeWocW3nTmMj7Ak82VhMu6eXAikHlxy44IoDg",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer <YOUR_ACCESS_TOKEN>"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "title",
+									"value": "Book test",
+									"type": "text"
+								},
+								{
+									"key": "type",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "genre",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "publish_date",
+									"value": "2024-03-16T12:00:00Z",
+									"type": "text"
+								},
+								{
+									"key": "description",
+									"value": "Test",
+									"type": "text"
+								},
+								{
+									"key": "image",
+									"type": "file",
+									"src": "/C:/Users/ALEJANDRO/Downloads/harrypotter.jpeg"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{url}}/api/items/",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"items",
+								""
+							]
+						},
+						"description": "Generated from cURL: curl -X POST http://localhost:8001/api/items/ \\\r\n     -H \"Authorization: Bearer <YOUR_ACCESS_TOKEN>\" \\\r\n     -H \"Content-Type: multipart/form-data\" \\\r\n     -F \"title=Sample Item\" \\\r\n     -F \"type=1\" \\\r\n     -F \"genre=2\" \\\r\n     -F \"publish_date=2024-03-16T12:00:00Z\" \\\r\n     -F \"description=A sample item for testing.\" \\\r\n     -F \"image=@/path/to/image.jpg\"\r\n"
+					},
+					"response": []
+				},
+				{
+					"name": "Items",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQyMjY0Nzg1LCJpYXQiOjE3NDIxNzgzODUsImp0aSI6ImJlYmY1YzVjYWIxZDRjNzZhNzg5Y2U3Mjk0M2FlMGU2IiwidXNlcl9pZCI6Mn0.LbqYXvPyu39PIi_HtAUesDmzxUnJ8ShlzrceJQWx_6Y",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer your_access_token"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/api/items/",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"items",
+								""
+							]
+						},
+						"description": "Generated from cURL: curl -X GET http://localhost:8000/api/items/ \\\r\n     -H \"Authorization: Bearer your_access_token\"\r\n"
+					},
+					"response": []
+				},
+				{
+					"name": "Item",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer your_access_token"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/api/items/1/",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"items",
+								"1",
+								""
+							]
+						},
+						"description": "Generated from cURL: curl -X GET http://localhost:8000/api/items/1/ \\\r\n     -H \"Authorization: Bearer your_access_token\"\r\n"
+					},
+					"response": []
+				},
+				{
+					"name": "Genres",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer your_access_token"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"name\": \"Sci-Fi\", \"createdAt\": \"2024-03-15\"}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000/api/genres/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"genres",
+								""
+							]
+						},
+						"description": "Generated from cURL: curl -X POST http://localhost:8000/api/genres/ \\\r\n     -H \"Authorization: Bearer your_access_token\" \\\r\n     -H \"Content-Type: application/json\" \\\r\n     -d '{\"name\": \"Sci-Fi\", \"createdAt\": \"2024-03-15\"}'\r\n"
+					},
+					"response": []
+				},
+				{
+					"name": "itemType",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQyMjU2NDkwLCJpYXQiOjE3NDIxNzAwOTAsImp0aSI6IjljZTY3YTQzY2VkMjQxZGNiYzAwNTJmYTYyYjIzNGI4IiwidXNlcl9pZCI6Mn0.IJaE7E5eTFCZJz7kgGC-3PwyLSEXNn1g4s-oM-j6XbU",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer your_access_token"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"name\": \"Book\"}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/api/itemtypes/",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"itemtypes",
+								""
+							]
+						},
+						"description": "Generated from cURL: curl -X POST http://localhost:8000/api/itemtypes/ \\\r\n     -H \"Authorization: Bearer your_access_token\" \\\r\n     -H \"Content-Type: application/json\" \\\r\n     -d '{\"name\": \"Electronics\"}'\r\n"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Posts",
+			"item": [
+				{
+					"name": "events",
+					"protocolProfileBehavior": {
+						"followAuthorizationHeader": false,
+						"strictSSL": false,
+						"followRedirects": false
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQwMTAwMDQ5LCJpYXQiOjE3NDAwMTM2NDksImp0aSI6ImIwOTYyNDdkMjUyMjRkODRhMzhkMWVjZDRiNmJhNWIyIiwidXNlcl9pZCI6MX0.MmADUaMErLYJf-Yez5nbxe5DxLUhuibPA7uAFCVTU80",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "default"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzE1MjY1ODk2LCJpYXQiOjE3MTUxNzk0OTYsImp0aSI6IjA0YjdhNzUwZTUzNDQ1MDBiZDNlNmY1NjJlNjI2M2Q0IiwidXNlcl9pZCI6MX0.ycIVZCYoHG6wnWIEg8O10LuoLZjLzOaW8FrYXosjnM4",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"user_id\": 1,\r\n    \"product_id\": 1,\r\n    \"timestamp\": \"2025-02-19\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/api/events/?id=1",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"events",
+								""
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "posting",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQyMzMyMDQzLCJpYXQiOjE3NDIyNDU2NDMsImp0aSI6IjYwNjc0ZGIyNDY1OTRkZDBiMTc2ZTE3YjY4YmMyZTYyIiwidXNlcl9pZCI6Mn0.KV1DjXai4kS4Xz0ENDNH6kWV8FqNC6DnrzZWveWE41g",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token YOUR_AUTH_TOKEN"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "title",
+									"value": "Read a Book",
+									"type": "text"
+								},
+								{
+									"key": "content",
+									"value": "Book from social media",
+									"type": "text"
+								},
+								{
+									"key": "image",
+									"type": "file",
+									"src": "/C:/Users/ALEJANDRO/Downloads/popcorn.jpg"
+								},
+								{
+									"key": "items",
+									"value": "6",
+									"type": "text"
+								},
+								{
+									"key": "items",
+									"value": "7",
+									"type": "text"
+								},
+								{
+									"key": "items",
+									"value": "8",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{url}}/api/posts/",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"posts",
+								""
+							]
+						},
+						"description": "Generated from cURL: curl -X POST http://your-api.com/api/posts/ \\\r\n     -H \"Authorization: Token YOUR_AUTH_TOKEN\" \\\r\n     -H \"Content-Type: multipart/form-data\" \\\r\n     -F \"user=USER_ID\" \\\r\n     -F \"title=Sample Post Title\" \\\r\n     -F \"content=This is the content of the post.\" \\\r\n     -F \"image=@/path/to/image.jpg\" \\\r\n     -F \"items=1\" \\\r\n     -F \"items=2\"\r\n"
+					},
+					"response": []
+				},
+				{
+					"name": "preSignedURL",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQyMzMyMDQzLCJpYXQiOjE3NDIyNDU2NDMsImp0aSI6IjYwNjc0ZGIyNDY1OTRkZDBiMTc2ZTE3YjY4YmMyZTYyIiwidXNlcl9pZCI6Mn0.KV1DjXai4kS4Xz0ENDNH6kWV8FqNC6DnrzZWveWE41g",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token YOUR_AUTH_TOKEN"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "title",
+									"value": "Read a Book",
+									"type": "text"
+								},
+								{
+									"key": "content",
+									"value": "Book from social media",
+									"type": "text"
+								},
+								{
+									"key": "image",
+									"type": "file",
+									"src": "/C:/Users/ALEJANDRO/Downloads/popcorn.jpg"
+								},
+								{
+									"key": "items",
+									"value": "6",
+									"type": "text"
+								},
+								{
+									"key": "items",
+									"value": "7",
+									"type": "text"
+								},
+								{
+									"key": "items",
+									"value": "8",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{url}}/api/get_presigned_url/?object_name=",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"get_presigned_url",
+								""
+							],
+							"query": [
+								{
+									"key": "object_name",
+									"value": ""
+								}
+							]
+						},
+						"description": "Generated from cURL: curl -X POST http://your-api.com/api/posts/ \\\r\n     -H \"Authorization: Token YOUR_AUTH_TOKEN\" \\\r\n     -H \"Content-Type: multipart/form-data\" \\\r\n     -F \"user=USER_ID\" \\\r\n     -F \"title=Sample Post Title\" \\\r\n     -F \"content=This is the content of the post.\" \\\r\n     -F \"image=@/path/to/image.jpg\" \\\r\n     -F \"items=1\" \\\r\n     -F \"items=2\"\r\n"
+					},
+					"response": []
+				},
+				{
+					"name": "Posting",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQxODI1NzQ1LCJpYXQiOjE3NDE3MzkzNDUsImp0aSI6Ijk2OTk0YjA0ZjJkYTRjOWI5ZjgxNDlhYzA1MDAzYmY4IiwidXNlcl9pZCI6M30.QypcWY_bbOMrAxv2sdbKgxDHEw0gxfvbdGNUDbIFF7E",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/api/posting/?id=6",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"posting",
+								""
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "6"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Chats",
+			"item": [
+				{
+					"name": "Chat",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQyMTkxMzU1LCJpYXQiOjE3NDIxMDQ5NTUsImp0aSI6ImEwNzMzYzZjZGY5YTRiMWViNWZiOGJiMTg4Njg5OTY5IiwidXNlcl9pZCI6M30.OTBb8Je3amcIjTOwcZx-ztXsWvG0KALH9_BPPku4dSQ",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer <JWT_TOKEN>"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"participants\": [2,3]}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/api/chats/1/",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"chats",
+								"1",
+								""
+							]
+						},
+						"description": "Generated from cURL: curl -X POST http://localhost:8001/api/chats/ \\\r\n     -H \"Content-Type: application/json\" \\\r\n     -H \"Authorization: Bearer <JWT_TOKEN>\" \\\r\n     -d '{\"participants\": [1, 2]}'\r\n2]\r\n}\r\n"
+					},
+					"response": []
+				},
+				{
+					"name": "Add_User",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQyMTkwMjM0LCJpYXQiOjE3NDIxMDM4MzQsImp0aSI6IjhjOGFlMTU2NjRlYjRlNzc4MDkxYzkwZmQ2OGMyMTRlIiwidXNlcl9pZCI6Mn0.mydxxbo42HjfEwPNro9p__khZrhFXIcUq_8vOVeQIEY",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer <JWT_TOKEN>"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"participants\": [2, 3]}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/api/chats/",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"chats",
+								""
+							]
+						},
+						"description": "Generated from cURL: curl -X POST http://localhost:8001/api/chats/ \\\r\n     -H \"Content-Type: application/json\" \\\r\n     -H \"Authorization: Bearer <JWT_TOKEN>\" \\\r\n     -d '{\"participants\": [1, 2]}'\r\n2]\r\n}\r\n"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "django-media",
+			"request": {
+				"method": "HEAD",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "AWS4-HMAC-SHA256 Credential=minio/minio123"
+					},
+					{
+						"key": "x-amz-content-sha256",
+						"value": "UNSIGNED-PAYLOAD"
+					},
+					{
+						"key": "x-amz-date",
+						"value": "$(date -u +%Y%m%dT%H%M%SZ)"
+					}
+				],
 				"url": {
-					"raw": "http://localhost:8001/api/token/",
+					"raw": "http://localhost:9001/django-media",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
-					"port": "8001",
+					"port": "9001",
 					"path": [
-						"api",
-						"token",
-						""
+						"django-media"
 					]
-				}
+				},
+				"description": "Generated from cURL: curl -I -X HEAD http://localhost:9000/django-media \\\r\n     -H \"Authorization: AWS4-HMAC-SHA256 Credential=minio/minio123\" \\\r\n     -H \"x-amz-content-sha256: UNSIGNED-PAYLOAD\" \\\r\n     -H \"x-amz-date: $(date -u +\"%Y%m%dT%H%M%SZ\")\"\r\n"
 			},
 			"response": []
 		},
 		{
-			"name": "test",
-			"protocolProfileBehavior": {
-				"followAuthorizationHeader": false,
-				"strictSSL": false,
-				"followRedirects": false,
-				"disableBodyPruning": true
-			},
+			"name": "health",
 			"request": {
 				"auth": {
-					"type": "bearer",
-					"bearer": [
+					"type": "awsv4",
+					"awsv4": [
 						{
-							"key": "token",
-							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQwMjQzMzA0LCJpYXQiOjE3NDAxNTY5MDQsImp0aSI6ImQxMDc0ZDc1MjgyODRlMjM4OTcxMTE4ZWNkZmYyMTVmIiwidXNlcl9pZCI6MX0.Eb3WtAgmOq1h6zqmibXd0sQEoYjkluNeRniTIpEVYO8",
+							"key": "secretKey",
+							"value": "mypassword",
+							"type": "string"
+						},
+						{
+							"key": "accessKey",
+							"value": "myuser",
+							"type": "string"
+						},
+						{
+							"key": "region",
+							"value": "us-east-1",
+							"type": "string"
+						},
+						{
+							"key": "service",
+							"value": "s3",
 							"type": "string"
 						}
 					]
 				},
 				"method": "GET",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json",
-						"type": "default"
-					},
-					{
-						"key": "Authorization",
-						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzE1MjY1ODk2LCJpYXQiOjE3MTUxNzk0OTYsImp0aSI6IjA0YjdhNzUwZTUzNDQ1MDBiZDNlNmY1NjJlNjI2M2Q0IiwidXNlcl9pZCI6MX0.ycIVZCYoHG6wnWIEg8O10LuoLZjLzOaW8FrYXosjnM4",
-						"type": "default"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"name\": \"Alejandro\"\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
+				"header": [],
 				"url": {
-					"raw": "{{url}}/api/test_request/",
+					"raw": "http://localhost:9000/",
+					"protocol": "http",
 					"host": [
-						"{{url}}"
+						"localhost"
 					],
+					"port": "9000",
 					"path": [
-						"api",
-						"test_request",
 						""
 					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "product",
-			"protocolProfileBehavior": {
-				"followAuthorizationHeader": false,
-				"strictSSL": false,
-				"followRedirects": false
-			},
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQwMjQzMzA0LCJpYXQiOjE3NDAxNTY5MDQsImp0aSI6ImQxMDc0ZDc1MjgyODRlMjM4OTcxMTE4ZWNkZmYyMTVmIiwidXNlcl9pZCI6MX0.Eb3WtAgmOq1h6zqmibXd0sQEoYjkluNeRniTIpEVYO8",
-							"type": "string"
-						}
-					]
 				},
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json",
-						"type": "default"
-					},
-					{
-						"key": "Authorization",
-						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzE1MjY1ODk2LCJpYXQiOjE3MTUxNzk0OTYsImp0aSI6IjA0YjdhNzUwZTUzNDQ1MDBiZDNlNmY1NjJlNjI2M2Q0IiwidXNlcl9pZCI6MX0.ycIVZCYoHG6wnWIEg8O10LuoLZjLzOaW8FrYXosjnM4",
-						"type": "default"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"title\": \"Django unchained\",\r\n    \"category\": \"Action\",\r\n    \"release_date\": \"2024-01-01\",\r\n    \"description\": \"Movie about intense action and redemption\"\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{url}}/api/products/?id=1",
-					"host": [
-						"{{url}}"
-					],
-					"path": [
-						"api",
-						"products",
-						""
-					],
-					"query": [
-						{
-							"key": "id",
-							"value": "1"
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "events",
-			"protocolProfileBehavior": {
-				"followAuthorizationHeader": false,
-				"strictSSL": false,
-				"followRedirects": false
-			},
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQwMTAwMDQ5LCJpYXQiOjE3NDAwMTM2NDksImp0aSI6ImIwOTYyNDdkMjUyMjRkODRhMzhkMWVjZDRiNmJhNWIyIiwidXNlcl9pZCI6MX0.MmADUaMErLYJf-Yez5nbxe5DxLUhuibPA7uAFCVTU80",
-							"type": "string"
-						}
-					]
-				},
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json",
-						"type": "default"
-					},
-					{
-						"key": "Authorization",
-						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzE1MjY1ODk2LCJpYXQiOjE3MTUxNzk0OTYsImp0aSI6IjA0YjdhNzUwZTUzNDQ1MDBiZDNlNmY1NjJlNjI2M2Q0IiwidXNlcl9pZCI6MX0.ycIVZCYoHG6wnWIEg8O10LuoLZjLzOaW8FrYXosjnM4",
-						"type": "default"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"user_id\": 1,\r\n    \"product_id\": 1,\r\n    \"timestamp\": \"2025-02-19\"\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{url}}/api/events/?id=1",
-					"host": [
-						"{{url}}"
-					],
-					"path": [
-						"api",
-						"events",
-						""
-					],
-					"query": [
-						{
-							"key": "id",
-							"value": "1"
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "login_copy",
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
-			"request": {
-				"method": "GET",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json",
-						"type": "default"
-					}
-				],
-				"body": {
-					"mode": "formdata",
-					"formdata": []
-				},
-				"url": {
-					"raw": "{{url}}/admin",
-					"host": [
-						"{{url}}"
-					],
-					"path": [
-						"admin"
-					]
-				}
+				"description": "Generated from cURL: curl -X GET \"http://localhost:9000/minio/health/live\" \\\r\n     -H \"Authorization: Basic $(echo -n \"${AWS_ACCESS_KEY_ID}:${AWS_SECRET_ACCESS_KEY}\" | base64)\" \\\r\n     -H \"Accept: application/json\"\r\n"
 			},
 			"response": []
 		}

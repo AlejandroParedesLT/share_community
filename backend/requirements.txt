@@ -50,3 +50,5 @@ daphne
 channels-redis
 
 django-cors-headers
+
+axios
