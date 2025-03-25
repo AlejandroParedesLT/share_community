@@ -1,39 +1,57 @@
-import { useState, useContext } from "react";
-import { AuthContext } from "../context/AuthContext";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
-const Login = () => {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const { login } = useContext(AuthContext);
+function Login() {
+    const [credentials, setCredentials] = useState({ username: "", password: "" });
+    const navigate = useNavigate(); // Hook to navigate programmatically
+    const API_URL = "http://localhost:8001";
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    await login(username, password);
-  };
+    const handleChange = (e) => {
+        setCredentials({ ...credentials, [e.target.name]: e.target.value });
+    };
 
-  return (
-    <div>
-      <h2>Login</h2>
-      console.log("Login Component Rendered"); 
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          placeholder="Username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          required
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-        <button type="submit">Login</button>
-      </form>
-    </div>
-  );
-};
+    const login = async () => {
+        try {
+            const data = new URLSearchParams();
+            data.append("username", credentials.username);
+            data.append("password", credentials.password);
+
+            const response = await axios.post(`${API_URL}/api/login/`, data, {
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            });
+
+            localStorage.setItem("accessToken", response.data.access);
+            alert("Login successful!");
+
+            // 🔥 Redirect to Dashboard after successful login
+            navigate("/dashboard");
+        } catch (error) {
+            console.error("Login error:", error);
+            alert("Login failed. Please check your credentials.");
+        }
+    };
+
+    return (
+        <div style={{ textAlign: "center", marginTop: "50px" }}>
+            <h2>Login Page</h2>
+            <input 
+                type="text" 
+                name="username" 
+                placeholder="Username" 
+                value={credentials.username} 
+                onChange={handleChange} 
+            />
+            <input 
+                type="password" 
+                name="password" 
+                placeholder="Password" 
+                value={credentials.password} 
+                onChange={handleChange} 
+            />
+            <button onClick={login}>Login</button>
+        </div>
+    );
+}
 
 export default Login;

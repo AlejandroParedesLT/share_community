@@ -1,27 +1,36 @@
-import { useEffect, useState } from "react";
-import api from "../api";
+import { useNavigate } from "react-router-dom";
 
-const Dashboard = () => {
-  const [books, setBooks] = useState([]);
+function Dashboard() {
+    const navigate = useNavigate();
 
-  useEffect(() => {
-    api
-      .get("/books/")
-      .then((res) => setBooks(res.data))
-      .catch((err) => console.error("Error fetching books:", err));
-  }, []);
+    const handleNavigateToItems = () => {
+        navigate("/items"); // Navigate to Items page
+    };
 
-  return (
-    <div>
-      console.log("Dashboard Component Rendered");
-      <h2>Dashboard</h2>
-      <ul>
-        {books.map((book) => (
-          <li key={book.id}>{book.title}</li>
-        ))}
-      </ul>
-    </div>
-  );
-};
+    const handleNavigateToPostItem = () => {
+        navigate("/post-item"); // Navigate to PostItem form
+    };
+
+    return (
+        <div style={{ textAlign: "center", marginTop: "50px" }}>
+            <h2>Dashboard</h2>
+            <div>
+                <button
+                    onClick={handleNavigateToItems}
+                    style={{ marginRight: "20px", padding: "10px 15px", cursor: "pointer" }}
+                >
+                    Go to Items
+                </button>
+                <button
+                    onClick={handleNavigateToPostItem}
+                    style={{ padding: "10px 15px", cursor: "pointer" }}
+                >
+                    Post New Item
+                </button>
+            </div>
+        </div>
+    );
+}
 
 export default Dashboard;
+
