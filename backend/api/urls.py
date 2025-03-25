@@ -73,6 +73,8 @@ urlpatterns = [
     
     # Chat routes
     path('', include(routingChat.urls)),
+    path("chats/<int:pk>/messages/", ChatViewSet.as_view({'get': 'messages'})),  # Add this line
+
 ]
 
 # path('posting/', PostView.as_view(), name='post_list'),

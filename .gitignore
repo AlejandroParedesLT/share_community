@@ -4,6 +4,8 @@ data/*
 *.log
 *__pycache__/
 
+share.env
+
 ref/
 temp
 .data

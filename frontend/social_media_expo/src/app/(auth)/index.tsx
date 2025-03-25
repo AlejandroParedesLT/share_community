@@ -34,7 +34,7 @@ export default function Auth() {
       const response = await fetch(`${Constants.expoConfig.extra.REACT_APP_BACKEND_URL}/api/user/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, email, password }),
+        body: JSON.stringify({ username: email, email, password }),
       });
 
       const data = await response.json();
