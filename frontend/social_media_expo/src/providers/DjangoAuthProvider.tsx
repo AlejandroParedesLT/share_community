@@ -48,6 +48,11 @@ export default function AuthProvider({ children }:any) {
   }, []);
 
   const fetchUser = async (token: string) => {
+    // Early return if no token is provided
+    if (!token) {
+      setUser(null);
+      return;
+    }
     try {
       const userInfo = await getUserInfo(token); // ✅ Fetch user from backend
       setUser(userInfo);

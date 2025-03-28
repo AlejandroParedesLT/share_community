@@ -272,29 +272,7 @@ export default function CreatePost() {
     type: `image/${fileType === "jpg" ? "jpeg" : fileType}`,
   } as unknown as Blob); // ✅ Ensure correct type
 
-    // // Convert media to an uploadable file
-    // const fileType = media.split('.').pop();
-    // formData.append("image", {
-    //   uri: media,
-    //   name: `upload.${fileType}`,
-    //   type: `image/${fileType}`, // Example: image/jpg, image/png
-    // }as any);
-  
-    // // const postData = {
-    // //   title,
-    // //   content: caption,
-    // //   image: response?.public_id,
-    // //   items: selectedItems.map((item) => item.precordsid),
-    // // };
-    
 
-  // Convert media to an uploadable file (React Native format)
-  // const fileType = media.split('.').pop();
-  // formData.append("image", {
-  //   uri: media,
-  //   name: `upload.${fileType}`,
-  //   type: `image/${fileType}`,
-  // } as any); // ✅ Fix TypeScript error
   console.log("Post Data:", formData);
   try {
     const res = await fetch(`${process.env.EXPO_PUBLIC_DJANGO_API_URL}/api/posts/`, {

@@ -5,13 +5,6 @@ import { FontAwesome } from '@expo/vector-icons';
 import { useAuth } from '../../providers/DjangoAuthProvider';
 
 export default function ChatsScreen() {
-  // // Simulated chat list
-  // const [chats, setChats] = useState([
-  //   { id: '1', name: 'Alice', lastMessage: 'Hey! How are you?', avatar: 'https://randomuser.me/api/portraits/women/1.jpg' },
-  //   { id: '2', name: 'Bob', lastMessage: 'Lets catch up soon!', avatar: 'https://randomuser.me/api/portraits/men/2.jpg' },
-  //   { id: '3', name: 'Charlie', lastMessage: 'See you tomorrow.', avatar: 'https://randomuser.me/api/portraits/men/3.jpg' },
-  // ]);
-
   // Init change here
 
   const [chats, setChats] = useState([]);
@@ -63,31 +56,6 @@ export default function ChatsScreen() {
       />
 
       {/* Chat List */}
-      {/* <FlatList
-        data={chats}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }) => {
-          const participantNames = item.participants.map(p => p.username).join(', ');
-          
-          return (
-            <TouchableOpacity 
-            style={styles.chatItem} 
-            onPress={() => router.push({
-              pathname: `/(chat)/${item.id}`,
-              params: { userName: participantNames  }
-            })}
-          >
-            <Image 
-              source={{ uri: item.avatar || 'https://cdn-icons-png.flaticon.com/512/166/166258.png' }} 
-              style={styles.avatar} 
-            />            <View style={styles.chatInfo}>
-              <Text style={styles.name}>{participantNames}</Text> 
-              <Text style={styles.lastMessage}>{item.last_message?.content || 'No messages yet'}</Text>
-            </View>
-          </TouchableOpacity>
-          )}}
-      /> */}
-
       <FlatList
         data={chats}
         keyExtractor={(item) => item.id.toString()}

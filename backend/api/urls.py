@@ -23,7 +23,8 @@ from api.views import (ItemTypeViewSet,
                        PostViewSet,
                        CountryViewSet,
                        ChatViewSet,
-                       MessageViewSet)
+                       MessageViewSet,
+                       ProfileViewSet)
 
 app_name = "api"
 
@@ -44,6 +45,7 @@ routerPostings.register(r'posts', PostViewSet)
 routingUsers = DefaultRouter()
 #routingUsers.register(r'user', UserView)
 routingUsers.register(r'countries', CountryViewSet)
+routingUsers.register(r'profile', ProfileViewSet)
 
 routingChat = DefaultRouter()
 routingChat.register(r'chats', ChatViewSet)

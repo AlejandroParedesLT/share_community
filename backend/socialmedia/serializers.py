@@ -31,11 +31,12 @@ class UserSerializer(serializers.ModelSerializer):
 class ProfileSerializer(serializers.ModelSerializer):
     username = serializers.CharField(source="user.username", read_only=True)  # Directly expose username
     userid = serializers.CharField(source="user.id", read_only=True)
+    email = serializers.CharField(source="user.email", read_only=True)
     presigned_image_url = serializers.SerializerMethodField()
     
     class Meta:
         model = Profile
-        fields = ["userid","username", "bio", "country", "presigned_image_url"]
+        fields = ["userid","username","email", "bio", "country", "presigned_image_url"]
     
     def get_presigned_image_url(self, obj):
         """Generate and return a pre-signed URL for the profile picture."""

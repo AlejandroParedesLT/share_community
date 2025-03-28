@@ -22,9 +22,8 @@ logging.basicConfig(filename=log_file, level=logging.INFO, format='%(asctime)s -
 
 
 from socialmedia.models import Profile, Country, Follower
-from socialmedia.serializers import FollowerSerializer
+from socialmedia.serializers import FollowerSerializer, CountrySerializer, ProfileSerializer
 from socialmedia.utils.minio_utils import upload_file, delete_file
-from socialmedia.serializers import CountrySerializer
 from socialmedia.permissions import IsOwnerOrReadOnly
 
 User = get_user_model()
@@ -39,6 +38,16 @@ class FollowerViewSet(viewsets.ModelViewSet):
     queryset = Follower.objects.all()
     serializer_class = FollowerSerializer
     permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
+    def perform_create(self, serializer):
+        """Set the user field to the authenticated user before saving."""
+        serializer.save(user=self.request.user)
+
+
+class ProfileViewSet(viewsets.ModelViewSet):
+    queryset = Profile.objects.all()
+    serializer_class = ProfileSerializer
+    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
+    lookup_field = "user_id" 
     def perform_create(self, serializer):
         """Set the user field to the authenticated user before saving."""
         serializer.save(user=self.request.user)
@@ -127,19 +136,12 @@ class UserView(APIView):
             user.save()
             profile, _ = Profile.objects.get_or_create(user=user)
 
-            if bio is not None:
-                profile.bio = bio
-
-            # if 'profile_picture' in request.FILES:
-            #     if profile.profile_picture:
-            #         profile.profile_picture.delete(save=False)
-            #     profile.profile_picture = request.FILES['profile_picture']
-
-            # profile.save()
             if 'profile_picture' in request.FILES:
                 image_file = request.FILES['profile_picture']
                 profile.profile_picture = image_file
                 profile.save()
+            profile.bio = bio
+            profile.save()
 
             return Response({'error': '0', 'message': f'User {user.username} updated successfully'}, status=200)
 
