@@ -7,6 +7,8 @@ import Login from "./pages/Login";
 import PostItem from "./pages/PostItem"; // Import the new components
 import Posts from "./pages/Posts";
 import PostPost from "./pages/PostPost";
+import UserProfile from "./pages/Profile";
+import ItemDetails from "./pages/ViewItem";
 
 function App() {
   return (
@@ -18,9 +20,13 @@ function App() {
               <Route path="/post-item" element={<PostItem />} /> {/* Add Post Item route */}
               <Route path="/posts" element={<Posts />} />
               <Route path="/create-post" element={<PostPost />} />
+              <Route path="/profile/:id" element={<UserProfile />} />
+              <Route path="/view-item/:precordsid" element={<ItemDetails />} />
           </Routes>
       </Router>
   );
 }
 
 export default App;
+
+

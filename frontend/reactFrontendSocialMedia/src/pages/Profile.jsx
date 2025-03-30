@@ -1,25 +1,19 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
-function Posts() {
-    const [posts, setPosts] = useState([]);
+function Profile() {
+    const [user, setUser] = useState(null);
+    const [posts, setPosts] = useState([]);  // State for posts
     const navigate = useNavigate();
+    const { id } = useParams();
     const API_URL = "http://localhost:8001";
     const token = localStorage.getItem("accessToken");
 
     // Color palette for avatars
     const avatarColors = [
-        '#0095f6',   // Original blue
-        '#5B4FD8',   // Purple
-        '#E1306C',   // Instagram pink
-        '#FF6B6B',   // Coral red
-        '#4ECDC4',   // Teal
-        '#45B7D1',   // Bright blue
-        '#F9D56E',   // Soft yellow
-        '#FF8C42',   // Orange
-        '#6A5ACD',   // Slate blue
-        '#2A9D8F',   // Teal green
+        '#0095f6', '#5B4FD8', '#E1306C', '#FF6B6B', '#4ECDC4',
+        '#45B7D1', '#F9D56E', '#FF8C42', '#6A5ACD', '#2A9D8F',
     ];
 
     const styles = {
@@ -58,6 +52,34 @@ function Posts() {
             borderRadius: '8px',
             cursor: 'pointer',
             fontWeight: '600',
+        },
+        profileInfo: {
+            display: 'flex',
+            alignItems: 'center',
+            gap: '20px',
+            marginBottom: '20px',
+        },
+        avatar: {
+            width: '80px',
+            height: '80px',
+            borderRadius: '50%',
+            backgroundColor: '#0095f6',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: 'white',
+            fontSize: '30px',
+            fontWeight: 'bold',
+        },
+        profilePicture: {
+            width: '80px',
+            height: '80px',
+            borderRadius: '50%',
+            objectFit: 'cover',
+        },
+        details: {
+            fontSize: '16px',
+            color: '#1c1e21',
         },
         gridContainer: {
             display: 'grid',
@@ -98,7 +120,6 @@ function Posts() {
             display: 'flex',
             alignItems: 'center',
             marginBottom: '15px',
-            color: '#1c1e21',
         },
         userAvatar: {
             width: '40px',
@@ -114,6 +135,12 @@ function Posts() {
         postText: {
             color: '#1c1e21',
             marginBottom: '15px',
+        },
+        noPostsMessage: {
+            textAlign: 'center',
+            color: '#65676b',
+            fontSize: '18px',
+            marginTop: '50px',
         },
         associatedItemsTitle: {
             fontSize: '16px',
@@ -141,11 +168,13 @@ function Posts() {
             objectFit: 'cover',
             borderRadius: '8px',
         },
-        noPostsMessage: {
-            textAlign: 'center',
-            color: '#65676b',
-            fontSize: '18px',
-            marginTop: '50px',
+        recentPostsHeader: {
+            fontSize: '24px',
+            fontWeight: '600',
+            color: '#1c1e21',
+            marginBottom: '20px',
+            borderBottom: '2px solid #ddd',
+            paddingBottom: '10px',
         }
     };
 
@@ -153,54 +182,63 @@ function Posts() {
         if (!token) {
             navigate("/");
         } else {
-            fetchPosts();
+            fetchUserProfile();
+            fetchUserPosts();  // Fetch posts after the profile
         }
-    }, [token, navigate]);
+    }, [token, navigate, id]);
 
-    const fetchPosts = async () => {
+    const fetchUserProfile = async () => {
         try {
-            const response = await axios.get(`${API_URL}/api/posts/`, {
+            const response = await axios.get(`${API_URL}/api/user/?id=${id}`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
-            
-            const postsData = response.data.results || response.data;
-            
-            // Sort posts in reverse chronological order
-            const sortedPosts = postsData.sort((a, b) => 
-                new Date(b.created_at) - new Date(a.created_at)
-            );
-            
-            setPosts(sortedPosts);
-            
-            console.log("Fetched and sorted posts:", sortedPosts);
+            setUser(response.data.data);
         } catch (error) {
-            console.error("Error fetching posts:", error);
-            console.error("Error response:", error.response);
-            alert("Failed to fetch posts.");
+            console.error("Error fetching user profile:", error);
+            alert("Failed to load user profile.");
         }
     };
 
+    const fetchUserPosts = async () => {
+        try {
+            const response = await axios.get(`${API_URL}/api/posts?id=${id}`, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            
+            // Log the response to inspect its structure
+            console.log("Response Data:", response.data);
+    
+            // Access posts from the 'results' array
+            const postsData = response.data.results || [];
+    
+            // Ensure postsData is an array
+            if (Array.isArray(postsData)) {
+                // Sort posts in reverse chronological order
+                const sortedPosts = postsData.sort((a, b) => 
+                    new Date(b.created_at) - new Date(a.created_at)
+                );
+                setPosts(sortedPosts);
+            } else {
+                console.error("Posts data is not an array:", postsData);
+            }
+        } catch (error) {
+            console.error("Error fetching user posts:", error);
+            alert("Failed to load user posts.");
+        }
+    };
+    
+
     // Helper function to get initials and randomize color
     const getInitialsAndColor = (name) => {
-        // Generate a consistent random color based on the name or a fallback
         const generateColor = (input) => {
-            if (!input) {
-                // If no input, use a truly random color
-                return avatarColors[Math.floor(Math.random() * avatarColors.length)];
-            }
-            
-            // Create a simple hash of the input string
             let hash = 0;
             for (let i = 0; i < input.length; i++) {
                 hash = input.charCodeAt(i) + ((hash << 5) - hash);
             }
-            
-            // Use the hash to select a color from the palette
             const index = Math.abs(hash) % avatarColors.length;
             return avatarColors[index];
         };
 
-        // Get initials
         const getInitials = () => {
             if (!name) return '?';
             const names = name.split(' ');
@@ -213,29 +251,37 @@ function Posts() {
         };
     };
 
-    const handlePostCardClick = (event, post) => {
-        // Prevent the click event from propagating to the post card click
-        event.stopPropagation();
-        navigate(`/profile/${post.user.userid}`);
-    };
-
-    const handleAssociatedItemClick = (event, item) => {
-        // Prevent the click event from propagating to the post card click
-        event.stopPropagation();
-        navigate(`/view-item/${item.precordsid}`);
-    };
-
     return (
         <div style={styles.pageContainer}>
             <div style={styles.container}>
                 <div style={styles.header}>
-                    <h2 style={styles.title}>Posts</h2>
-                    <button 
-                        onClick={() => navigate("/dashboard")} 
-                        style={styles.backButton}
-                    >
+                    <h2 style={styles.title}>Profile</h2>
+                    <button onClick={() => navigate("/dashboard")} style={styles.backButton}>
                         Back to Dashboard
                     </button>
+                </div>
+
+                {user ? (
+                    <div style={styles.profileInfo}>
+                        {user.profile_picture ? (
+                            <img src={user.profile_picture} alt="Profile" style={styles.profilePicture} />
+                        ) : (
+                            <div style={styles.avatar}>
+                                {user.username ? user.username[0].toUpperCase() : '?'}
+                            </div>
+                        )}
+                        <div style={styles.details}>
+                            <p><strong>Username:</strong> {user.username}</p>
+                            <p><strong>About Me:</strong> {user.bio || 'No bio available'}</p>
+                        </div>
+                    </div>
+                ) : (
+                    <p>Loading profile...</p>
+                )}
+
+                {/* Recent Posts Header */}
+                <div style={styles.recentPostsHeader}>
+                    Recent Posts
                 </div>
 
                 {posts.length === 0 ? (
@@ -245,17 +291,12 @@ function Posts() {
                 ) : (
                     <div style={styles.gridContainer}>
                         {posts.map((post) => {
-                            const { initials, color } = getInitialsAndColor(
-                                post.user?.username || 
-                                post.user?.email || 
-                                'Unknown'
-                            );
+                            const { initials, color } = getInitialsAndColor(post.user?.username || 'Unknown');
 
                             return (
                                 <div 
                                     key={post.id} 
                                     style={styles.postCard}
-                                    onClick={(event) => handlePostCardClick(event, post)} // Post card click
                                     onMouseEnter={(e) => {
                                         e.currentTarget.style.transform = styles.postCardHover.transform;
                                     }}
@@ -284,7 +325,7 @@ function Posts() {
                                             </div>
                                             <div>
                                                 <p style={{margin: 0, fontWeight: 'bold', fontSize: '14px'}}>
-                                                    {post.user?.username || post.user?.email || 'Unknown User'}
+                                                    {post.user?.username || 'Unknown User'}
                                                 </p>
                                             </div>
                                         </div>
@@ -297,7 +338,6 @@ function Posts() {
                                         {post.content && (
                                             <p style={styles.postText}>{post.content}</p>
                                         )}
-                                        
                                         {post.items && post.items.length > 0 && (
                                             <div>
                                                 <h4 style={styles.associatedItemsTitle}>
@@ -307,7 +347,7 @@ function Posts() {
                                                     <div 
                                                         key={item.precordsid} 
                                                         style={styles.associatedItem}
-                                                        onClick={(event) => handleAssociatedItemClick(event, item)} // Individual item click
+                                                        onClick={() => navigate(`/view-item/${item.precordsid}`)} // Redirect to view-item with precordsid
                                                         onMouseEnter={(e) => {
                                                             e.currentTarget.style.transform = styles.associatedItemHover.transform;
                                                         }}
@@ -338,4 +378,4 @@ function Posts() {
     );
 }
 
-export default Posts;
+export default Profile;

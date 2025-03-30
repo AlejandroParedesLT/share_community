@@ -39,6 +39,13 @@ function PostPost() {
             boxShadow: "0 6px 8px rgba(0,0,0,0.1)",
             maxHeight: '90vh',
             overflowY: 'auto',
+        
+            // Centering styles
+            display: "flex",
+            flexDirection: "column", // Align items in a column
+            justifyContent: "center", // Center vertically
+            alignItems: "center", // Center horizontally
+            textAlign: "center" // Ensures text alignment is centered
         },
         textarea: {
             width: "calc(100% - 30px)",
@@ -59,8 +66,8 @@ function PostPost() {
             display: 'none',
         },
         uploadButton: {
-            width: "calc(100% - 30px)",
-            padding: '15px', 
+            display: 'inline-block',  // Only as wide as its content
+            padding: '10px 15px', // Adjust padding for better sizing
             backgroundColor: '#8A3AB9', 
             color: 'white',
             border: 'none',
@@ -69,12 +76,8 @@ function PostPost() {
             cursor: 'pointer',
             fontWeight: '600',
             marginTop: '2.5px', 
-            marginBottom: '25px', 
-            marginLeft: 'auto',  // Center horizontally
-            marginRight: 'auto', // Center horizontally
-            boxSizing: 'border-box',
-            display: 'block',  // Changed to block to enable horizontal centering
-            textAlign: 'center',
+            marginBottom: '25px',
+            textAlign: 'center'
         },
         select: {
             width: "calc(100% - 30px)",

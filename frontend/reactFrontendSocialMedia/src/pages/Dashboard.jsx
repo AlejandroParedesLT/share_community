@@ -47,6 +47,15 @@ function Dashboard() {
             color: '#65676b',
             marginBottom: '20px',
         },
+        rainbowText: {
+            backgroundImage: "linear-gradient(90deg, red, orange, yellow, green, cyan, blue, violet)",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            fontWeight: 'bold',
+            fontSize: '24px',
+            display: 'inline-block',
+            animation: 'rainbowText 3s linear infinite',
+        },
         buttonContainer: {
             display: 'grid',
             gridTemplateColumns: '1fr 1fr',
@@ -69,18 +78,25 @@ function Dashboard() {
         }
     };
 
-    const handleNavigateWithHover = (navigateFn) => {
-        navigateFn();
-    };
-
     return (
         <div style={styles.pageContainer}>
+            <style>
+                {`
+                    @keyframes rainbowText {
+                        0% { filter: hue-rotate(0deg); }
+                        100% { filter: hue-rotate(360deg); }
+                    }
+                `}
+            </style>
+
             <div style={styles.container}>
-                <h2 style={styles.title}>Welcome, {username}</h2>
+                <h2 style={styles.title}>
+                    Welcome, <span style={styles.rainbowText}>{username}</span>
+                </h2>
                 <p style={styles.welcomeSubtitle}>What would you like to do today?</p>
                 <div style={styles.buttonContainer}>
                     <button
-                        onClick={() => handleNavigateWithHover(() => navigate("/items"))}
+                        onClick={() => navigate("/items")}
                         style={styles.button}
                         onMouseEnter={(e) => {
                             e.target.style.backgroundColor = styles.buttonHover.backgroundColor;
@@ -91,10 +107,10 @@ function Dashboard() {
                             e.target.style.transform = 'scale(1)';
                         }}
                     >
-                        Go to Items
+                        View Our Item Catalog
                     </button>
                     <button
-                        onClick={() => handleNavigateWithHover(() => navigate("/post-item"))}
+                        onClick={() => navigate("/post-item")}
                         style={styles.button}
                         onMouseEnter={(e) => {
                             e.target.style.backgroundColor = styles.buttonHover.backgroundColor;
@@ -105,10 +121,10 @@ function Dashboard() {
                             e.target.style.transform = 'scale(1)';
                         }}
                     >
-                        Post New Item
+                        Suggest a New Item
                     </button>
                     <button
-                        onClick={() => handleNavigateWithHover(() => navigate("/posts"))}
+                        onClick={() => navigate("/posts")}
                         style={styles.button}
                         onMouseEnter={(e) => {
                             e.target.style.backgroundColor = styles.buttonHover.backgroundColor;
@@ -119,10 +135,10 @@ function Dashboard() {
                             e.target.style.transform = 'scale(1)';
                         }}
                     >
-                        View Posts
+                        View Feed
                     </button>
                     <button
-                        onClick={() => handleNavigateWithHover(() => navigate("/create-post"))}
+                        onClick={() => navigate("/create-post")}
                         style={styles.button}
                         onMouseEnter={(e) => {
                             e.target.style.backgroundColor = styles.buttonHover.backgroundColor;
@@ -133,7 +149,7 @@ function Dashboard() {
                             e.target.style.transform = 'scale(1)';
                         }}
                     >
-                        Create New Post
+                        Make a Post!
                     </button>
                 </div>
             </div>
