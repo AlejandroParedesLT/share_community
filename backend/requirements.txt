@@ -50,3 +50,10 @@ daphne
 channels-redis
 
 django-cors-headers
+
+# Added
+axios
+
+chardet
+
+requests
