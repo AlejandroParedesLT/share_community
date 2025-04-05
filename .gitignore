@@ -1,3 +1,6 @@
+large_files/
+archive_new/
+
 .env
 data/*
 */pgdata/
