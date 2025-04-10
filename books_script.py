@@ -22,6 +22,7 @@ PASSWORD = "adminpassword"  # Replace with your password
 # Define a mapping of genre names to IDs (adjust with your actual IDs)
 with open('/Users/rishikarandev/Downloads/genres.json', 'r') as f:
     genre_map = json.load(f)
+    genres = genre_map.get("genres", [])
 
 
 def get_auth_token():
@@ -103,7 +104,7 @@ def load_books_from_csv(auth_token, image_map):
                     genre_list = ast.literal_eval(genre_str)
                     first_genre = genre_list[0] if genre_list else ""
                     # Get genre ID from the mapping
-                    genre_id = genre_map.get(first_genre, "1")
+                    genre_id = next((str(genre["id"]) for genre in genres if genre["name"] == first_genre), "1")
                 except (SyntaxError, ValueError):
                     # Fallback if parsing fails
                     print(f"Warning: Could not parse genre for {title}. Using 1 as genre.")
