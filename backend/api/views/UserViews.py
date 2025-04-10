@@ -54,6 +54,7 @@ class UserView(APIView):
     def get(self, request, user_id=None):
         """Allow users to view any user profile by ID"""
         try:
+            user_id = request.GET.get('id')
             if user_id:
                 user = User.objects.get(id=user_id)
             else:

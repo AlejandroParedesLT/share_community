@@ -88,12 +88,18 @@ class PostViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         """Set the user field to the authenticated user before saving."""
         serializer.save(user=self.request.user)
-    # def get_queryset(self):
-    #     limit = self.request.query_params.get('limit', 10)  # Default to 10 if not provided
-    #     return Post.objects.all().order_by('-created_at')[:int(limit)]
 
-
-
+    def get_queryset(self):
+        """
+        This method is responsible for filtering posts based on the user ID.
+        If a 'user_id' query parameter is provided, it filters the posts for that specific user.
+        """
+        user_id = self.request.query_params.get('id')  # Retrieve 'user_id' from the query params
+        
+        if user_id:
+            return Post.objects.filter(user__id=user_id)  # Filter posts by user ID
+        
+        return Post.objects.all()  # Return all posts if no user_id is provided
 
 # @api_view(["GET"])
 # @permission_classes([IsAuthenticated])
