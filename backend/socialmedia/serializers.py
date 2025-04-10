@@ -121,7 +121,6 @@ class PostSerializer(serializers.ModelSerializer):
     user = ProfileSerializer(source="user.profile", read_only=True)
     presigned_image_url = serializers.SerializerMethodField()  # Add field for pre-signed URL
 
-
     class Meta:
         model = Post
         fields = '__all__'

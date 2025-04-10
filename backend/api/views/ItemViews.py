@@ -35,6 +35,7 @@ class GenreViewSet(viewsets.ModelViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     permission_classes = [IsAuthenticated]
+    
 
 class ItemViewSet(viewsets.ModelViewSet):
     queryset = Item.objects.all()
