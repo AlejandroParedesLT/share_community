@@ -65,7 +65,7 @@ class UserView(APIView):
                 'id': user.id,
                 'username': user.username,
                 'email': user.email,
-                'bio': profile.bio,
+                'bio': profile.bio,  # random description
                 'profile_picture': profile.profile_picture.url if profile.profile_picture else None,
                 'country': profile.country.name if profile.country else None
             }
