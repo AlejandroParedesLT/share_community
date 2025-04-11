@@ -1,13 +1,18 @@
-#Alejandro Paredes La Torre
-#Import necessary libraries
-from rest_framework.decorators import api_view, authentication_classes, permission_classes
+# Alejandro Paredes La Torre
+# Import necessary libraries
+from rest_framework.decorators import (
+    api_view,
+    authentication_classes,
+    permission_classes,
+)
 from rest_framework.authentication import SessionAuthentication, TokenAuthentication
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
 from rest_framework.decorators import permission_classes
-from rest_framework import viewsets
+from rest_framework import viewsets, permissions
+from rest_framework import status
 
 from django.db import IntegrityError
 from django.contrib.auth import get_user_model
@@ -16,28 +21,59 @@ from django.contrib.auth.models import User
 from django.db.utils import IntegrityError
 
 import logging
+
 # Setting up logging
-log_file = './requests_logs.log'
-logging.basicConfig(filename=log_file, level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+log_file = "./requests_logs.log"
+logging.basicConfig(
+    filename=log_file,
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+)
 
 
-from socialmedia.models import Profile, Country, Follower
-from socialmedia.serializers import FollowerSerializer, CountrySerializer, ProfileSerializer
+from socialmedia.models import Profile, Country, Follower, Preference
+from socialmedia.serializers import (
+    FollowerSerializer,
+    CountrySerializer,
+    ProfileSerializer,
+    PreferenceSerializer,
+)
 from socialmedia.utils.minio_utils import upload_file, delete_file
 from socialmedia.permissions import IsOwnerOrReadOnly
 
 User = get_user_model()
 
+
+###
+
+
+class PreferenceViewSet(viewsets.ModelViewSet):
+    queryset = Preference.objects.all()
+    serializer_class = PreferenceSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def perform_create(self, serializer):
+        # Automatically associate the logged-in user with the preferences
+        serializer.save(user=self.request.user)
+
+
 class CountryViewSet(viewsets.ModelViewSet):
     queryset = Country.objects.all()
     serializer_class = CountrySerializer
-    permission_classes = [IsAuthenticated, IsAdminUser]
+    # permission_classes = [IsAuthenticated, IsAdminUser]
+    permission_classes = [AllowAny]
+
+    def list(self, request, *args, **kwargs):
+        """Return a list of country names for the frontend dropdown."""
+        countries = Country.objects.values_list("name", flat=True)
+        return Response({"countries": list(countries)})
 
 
 class FollowerViewSet(viewsets.ModelViewSet):
     queryset = Follower.objects.all()
     serializer_class = FollowerSerializer
     permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
+
     def perform_create(self, serializer):
         """Set the user field to the authenticated user before saving."""
         serializer.save(user=self.request.user)
@@ -47,16 +83,63 @@ class ProfileViewSet(viewsets.ModelViewSet):
     queryset = Profile.objects.all()
     serializer_class = ProfileSerializer
     permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
-    lookup_field = "user_id" 
+    lookup_field = "user_id"
+
     def perform_create(self, serializer):
         """Set the user field to the authenticated user before saving."""
         serializer.save(user=self.request.user)
 
 
+class UserRegisterView(APIView):
+    permission_classes = [AllowAny]  # Allow signup without authentication
+
+    def post(self, request):
+        """Register a new user and return a JWT token"""
+        try:
+            data = request.data
+            username = data.get("username")
+            email = data.get("email")
+            password = data.get("password")
+            bio = data.get("bio", "")
+
+            if not username or not email or not password:
+                return Response(
+                    {"error": "1", "message": "Missing required fields"}, status=400
+                )
+
+            user = User.objects.create_user(
+                username=username, email=email, password=password
+            )
+            profile = Profile.objects.create(user=user, bio=bio)
+
+            # Generate JWT token
+            refresh = RefreshToken.for_user(user)
+            access_token = str(refresh.access_token)
+
+            return Response(
+                {
+                    "error": "0",
+                    "message": f"User {user.username} created successfully",
+                    "access": access_token,
+                    "refresh": str(refresh),
+                },
+                status=201,
+            )
+
+        except IntegrityError:
+            return Response(
+                {"error": "2", "message": "Username or email already exists"},
+                status=400,
+            )
+        except Exception as e:
+            return Response({"error": "3", "message": str(e)}, status=500)
+
+
+###
 class UserView(APIView):
     def get_permissions(self):
         """Define permissions based on the request method"""
-        if self.request.method == 'POST':
+        if self.request.method == "POST":
             return [AllowAny()]  # Anyone can register
         return [IsAuthenticated()]  # Other actions require authentication
 
@@ -67,53 +150,67 @@ class UserView(APIView):
                 user = User.objects.get(id=user_id)
             else:
                 user = request.user  # Default to the authenticated user
-            
+
             profile, _ = Profile.objects.get_or_create(user=user)
-            
+
             user_data = {
-                'id': user.id,
-                'username': user.username,
-                'email': user.email,
-                'bio': profile.bio,
-                'profile_picture': profile.profile_picture.url if profile.profile_picture else None,
-                'country': profile.country.name if profile.country else None
+                "id": user.id,
+                "username": user.username,
+                "email": user.email,
+                "bio": profile.bio,
+                "profile_picture": (
+                    profile.profile_picture.url if profile.profile_picture else None
+                ),
+                "country": profile.country.name if profile.country else None,
             }
-            return Response({'error': '0', 'message': 'Success', 'data': user_data}, status=200)
+            return Response(
+                {"error": "0", "message": "Success", "data": user_data}, status=200
+            )
 
         except User.DoesNotExist:
-            return Response({'error': '1', 'message': 'User not found'}, status=404)
+            return Response({"error": "1", "message": "User not found"}, status=404)
         except Exception as e:
-            logging.error('Error fetching profile: %s', e)
-            return Response({'error': '2', "message": str(e)}, status=500)
+            logging.error("Error fetching profile: %s", e)
+            return Response({"error": "2", "message": str(e)}, status=500)
 
     def post(self, request):
         """Register a new user"""
         try:
             data = request.data
-            username = data.get('username')
-            email = data.get('email')
-            password = data.get('password')
-            bio = data.get('bio', '')
+            username = data.get("username")
+            email = data.get("email")
+            password = data.get("password")
+            bio = data.get("bio", "")
 
             if not username or not email or not password:
-                return Response({'error': '1', 'message': 'Missing required fields'}, status=400)
+                return Response(
+                    {"error": "1", "message": "Missing required fields"}, status=400
+                )
 
-            user = User.objects.create_user(username=username, email=email, password=password)
+            user = User.objects.create_user(
+                username=username, email=email, password=password
+            )
             profile = Profile.objects.create(user=user, bio=bio)
-            
-            if 'profile_picture' in request.FILES:
-                image_file = request.FILES['profile_picture']
+
+            if "profile_picture" in request.FILES:
+                image_file = request.FILES["profile_picture"]
                 file_url = upload_file(image_file, "profile_pics/")
                 profile.profile_picture.name = file_url
                 profile.save()
 
-            return Response({'error': '0', 'message': f'User {user.username} created successfully'}, status=201)
+            return Response(
+                {"error": "0", "message": f"User {user.username} created successfully"},
+                status=201,
+            )
 
         except IntegrityError:
-            return Response({'error': '2', 'message': 'Username or email already exists'}, status=400)
+            return Response(
+                {"error": "2", "message": "Username or email already exists"},
+                status=400,
+            )
         except Exception as e:
-            logging.error('Error creating user: %s', e)
-            return Response({'error': '3', 'message': str(e)}, status=500)
+            logging.error("Error creating user: %s", e)
+            return Response({"error": "3", "message": str(e)}, status=500)
 
     def put(self, request):
         """Allow a user to update only their own profile"""
@@ -121,10 +218,10 @@ class UserView(APIView):
             user = request.user
             data = request.data
 
-            username = data.get('username')
-            email = data.get('email')
-            password = data.get('password')
-            bio = data.get('bio')
+            username = data.get("username")
+            email = data.get("email")
+            password = data.get("password")
+            bio = data.get("bio")
 
             if username:
                 user.username = username
@@ -136,18 +233,21 @@ class UserView(APIView):
             user.save()
             profile, _ = Profile.objects.get_or_create(user=user)
 
-            if 'profile_picture' in request.FILES:
-                image_file = request.FILES['profile_picture']
+            if "profile_picture" in request.FILES:
+                image_file = request.FILES["profile_picture"]
                 profile.profile_picture = image_file
                 profile.save()
             profile.bio = bio
             profile.save()
 
-            return Response({'error': '0', 'message': f'User {user.username} updated successfully'}, status=200)
+            return Response(
+                {"error": "0", "message": f"User {user.username} updated successfully"},
+                status=200,
+            )
 
         except Exception as e:
-            logging.error('Error updating user: %s', e)
-            return Response({'error': '3', 'message': str(e)}, status=500)
+            logging.error("Error updating user: %s", e)
+            return Response({"error": "3", "message": str(e)}, status=500)
 
     def delete(self, request):
         """Allow users to delete only their own account"""
@@ -156,12 +256,15 @@ class UserView(APIView):
             username = user.username
             user.delete()
 
-            return Response({'error': '0', 'message': f'User {username} deleted successfully'}, status=200)
+            return Response(
+                {"error": "0", "message": f"User {username} deleted successfully"},
+                status=200,
+            )
 
         except Exception as e:
-            logging.error('Error deleting user: %s', e)
-            return Response({'error': '3', 'message': str(e)}, status=500)
-    
+            logging.error("Error deleting user: %s", e)
+            return Response({"error": "3", "message": str(e)}, status=500)
+
 
 # class UserView(APIView):
 #     def get_permissions(self):
@@ -182,7 +285,7 @@ class UserView(APIView):
 #         except Exception as e:
 #             logging.error('Error Request: %s', e)
 #             return Response({'error': '2', "message": str(e)}, status=502)
-        
+
 #     def post(self, request):
 #         try:
 #             data = request.data

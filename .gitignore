@@ -1,5 +1,7 @@
 large_files/
+large_files_new/
 archive_new/
+kaggle.json
 
 .env
 data/*

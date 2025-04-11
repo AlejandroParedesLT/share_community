@@ -6,6 +6,7 @@
 		"_exporter_id": "21314598"
 	},
 	"item": [
+
 		{
 			"name": "token",
 			"request": {
@@ -33,7 +34,7 @@
 					]
 				},
 				"url": {
-					"raw": "http://localhost:8001/api/token/",
+					"raw": "{{url}}/api/token/",
 					"protocol": "http",
 					"host": [
 						"localhost"
