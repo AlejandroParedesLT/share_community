@@ -18,15 +18,13 @@ def load_datasets(books_path='merged_books.csv',
     return books_df, music_df, movies_df
 
 def create_integrated_dataset(books_df, music_df, movies_df, 
-                              n_users=200, records_per_user=50,
-                              simulate_missing=True,
                               output_path='unified_preferences.csv',
                               mapping_path='unified_user_mapping.csv'):
     """
-    Create an integrated dataset with users from all three domains,
-    not restricted by the smallest dataset.
+    Create an integrated dataset using the minimum number of users across datasets.
+    Each user will have real data from all three domains.
     """
-    print("Creating integrated dataset...")
+    print("Creating integrated dataset with minimum user count across domains...")
     
     # Get unique users from each dataset
     book_users = books_df['User-ID'].unique()
@@ -35,29 +33,25 @@ def create_integrated_dataset(books_df, music_df, movies_df,
     
     print(f"Available unique users - Books: {len(book_users)}, Music: {len(music_users)}, Movies: {len(movie_users)}")
     
-    # Determine the target number of users
-    n_users_actual = min(n_users, max(len(book_users), len(music_users), len(movie_users)))
+    # Use the minimum number of users across all datasets
+    min_users_count = min(len(book_users), len(music_users), len(movie_users))
+    print(f"Using {min_users_count} users as baseline (minimum across datasets)")
     
-    if n_users_actual < n_users:
-        print(f"Warning: Reducing target users to {n_users_actual} due to dataset limitations")
+    # Randomly select users from each dataset
+    selected_book_users = np.random.choice(book_users, min_users_count, replace=False)
+    selected_music_users = np.random.choice(music_users, min_users_count, replace=False)
+    selected_movie_users = np.random.choice(movie_users, min_users_count, replace=False)
     
-    # Create synthetic users by randomly assigning IDs from each domain
+    # Create user mapping
     synthetic_users = []
-    book_users_list = list(book_users)
-    music_users_list = list(music_users)
-    movie_users_list = list(movie_users)
     
-    for i in range(n_users_actual):
-        # Randomly select a user ID from each domain
-        book_user = random.choice(book_users_list) if book_users_list else None
-        music_user = random.choice(music_users_list) if music_users_list else None
-        movie_user = random.choice(movie_users_list) if movie_users_list else None
-        
+    # For each index, create a mapping between the three domains
+    for i in range(min_users_count):
         synthetic_users.append({
-            'user_id': i + 1,
-            'book_user_id': book_user,
-            'music_user_id': music_user,
-            'movie_user_id': movie_user
+            'user_id': i + 1,  # New unified ID
+            'book_user_id': selected_book_users[i],
+            'music_user_id': selected_music_users[i],
+            'movie_user_id': selected_movie_users[i]
         })
     
     # Create a user mapping dataframe
@@ -65,90 +59,46 @@ def create_integrated_dataset(books_df, music_df, movies_df,
     
     # Prepare the integrated dataset
     integrated_data = []
-    simulated_count = 0
     book_count = 0
     music_count = 0
     movie_count = 0
     
-    # Process each synthetic user
+    # Process each user
     for _, user in user_map.iterrows():
-        user_id = user['user_id']
+        user_id = user['user_id']  # Unified user ID
         book_user = user['book_user_id']
         music_user = user['music_user_id']
         movie_user = user['movie_user_id']
         
         # Books
-        if book_user is not None:
-            user_books = books_df[books_df['User-ID'] == book_user]
-            target_books = min(records_per_user // 3, len(user_books))
-            
-            if target_books > 0:
-                if target_books < len(user_books):
-                    user_books = user_books.sample(target_books)
-                
-                for _, row in user_books.iterrows():
-                    integrated_data.append({
-                        'user_id': user_id,
-                        'item_id': row['ISBN'],
-                        'item_type': 1  # 1 for books
-                    })
-                    book_count += 1
+        user_books = books_df[books_df['User-ID'] == book_user]
+        for _, row in user_books.iterrows():
+            integrated_data.append({
+                'user_id': user_id,
+                'item_id': row['ISBN'],
+                'item_type': 1,  # 1 for books
+            })
+            book_count += 1
         
         # Music
-        if music_user is not None:
-            user_music = music_df[music_df['user_id'] == music_user]
-            target_music = min(records_per_user // 3, len(user_music))
-            
-            if target_music > 0:
-                if target_music < len(user_music):
-                    user_music = user_music.sample(target_music)
-                
-                for _, row in user_music.iterrows():
-                    integrated_data.append({
-                        'user_id': user_id,
-                        'item_id': row['track_id'],
-                        'item_type': 3  # 3 for music
-                    })
-                    music_count += 1
-        elif simulate_missing:
-            # Simulate music preferences if needed
-            for _ in range(records_per_user // 3):
-                random_track = music_df.sample(1).iloc[0]['track_id']
-                integrated_data.append({
-                    'user_id': user_id,
-                    'item_id': random_track,
-                    'item_type': 3  # 3 for music
-                })
-                music_count += 1
-                simulated_count += 1
+        user_music = music_df[music_df['user_id'] == music_user]
+        for _, row in user_music.iterrows():
+            integrated_data.append({
+                'user_id': user_id,
+                'item_id': row['track_id'],
+                'item_type': 3,  # 3 for music
+            })
+            music_count += 1
         
         # Movies
-        if movie_user is not None:
-            user_movies = movies_df[movies_df['user_id'] == movie_user]
-            target_movies = min(records_per_user // 3, len(user_movies))
-            
-            if target_movies > 0:
-                if target_movies < len(user_movies):
-                    user_movies = user_movies.sample(target_movies)
-                
-                for _, row in user_movies.iterrows():
-                    integrated_data.append({
-                        'user_id': user_id,
-                        'item_id': row['id'],
-                        'item_type': 2  # 2 for movies
-                    })
-                    movie_count += 1
-        elif simulate_missing:
-            # Simulate movie preferences if needed
-            for _ in range(records_per_user // 3):
-                random_movie = movies_df.sample(1).iloc[0]['id']
-                integrated_data.append({
-                    'user_id': user_id,
-                    'item_id': random_movie,
-                    'item_type': 2  # 2 for movies
-                })
-                movie_count += 1
-                simulated_count += 1
+        user_movies = movies_df[movies_df['user_id'] == movie_user]
+        for _, row in user_movies.iterrows():
+            integrated_data.append({
+                'user_id': user_id,
+                'item_id': row['id'],
+                'item_type': 2,  # 2 for movies
+            })
+            movie_count += 1
     
     # Create and save the integrated dataset
     integrated_df = pd.DataFrame(integrated_data)
@@ -165,7 +115,7 @@ def create_integrated_dataset(books_df, music_df, movies_df,
     print(f"Book records: {book_count}")
     print(f"Movie records: {movie_count}")
     print(f"Music records: {music_count}")
-    print(f"Simulated records: {simulated_count}")
+    print(f"Average records per user: {len(integrated_df) / integrated_df['user_id'].nunique():.2f}")
     
     print("Sample data:")
     print(integrated_df.head())
@@ -174,10 +124,8 @@ def create_integrated_dataset(books_df, music_df, movies_df,
 
 def main(books_path='merged_books.csv', 
          music_path='Music_User_ID_Popularity.csv',
-         movies_path='shortened_movie_users.csv',
-         n_users=200,
-         records_per_user=50):
-    """Main function to run the entire process."""
+         movies_path='shortened_movie_users.csv'):
+    """Main function to run the entire process using minimum users across datasets."""
     print("Loading datasets...")
     books_df, music_df, movies_df = load_datasets(books_path, music_path, movies_path)
     
@@ -185,9 +133,6 @@ def main(books_path='merged_books.csv',
         books_df=books_df,
         music_df=music_df,
         movies_df=movies_df,
-        n_users=n_users,
-        records_per_user=records_per_user,
-        simulate_missing=True,
         output_path='unified_preferences.csv',
         mapping_path='unified_user_mapping.csv'
     )
@@ -195,8 +140,5 @@ def main(books_path='merged_books.csv',
     return integrated_df, user_mapping_df
 
 if __name__ == "__main__":
-    # Create the integrated dataset
-    integrated_df, user_mapping_df = main(
-        n_users=200,           # Target 200 users in the integrated dataset
-        records_per_user=50    # Target 50 records per user (approximately)
-    )
+    # Create the integrated dataset with minimum users across datasets
+    integrated_df, user_mapping_df = main()
