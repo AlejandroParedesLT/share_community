@@ -52,3 +52,4 @@ channels-redis
 django-cors-headers
 
 pgvector
+
