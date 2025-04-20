@@ -10,7 +10,9 @@ from api.views import (
     AudioView, 
     BookView, 
     MovieView, 
-    UserView, 
+    UserView,
+    # RecommenderView,  # Uncomment if you have a recommender view
+    RecommenderViews
 )
 from api.views import (ItemTypeViewSet, 
                        GenreViewSet, 
@@ -51,6 +53,11 @@ routingChat = DefaultRouter()
 routingChat.register(r'chats', ChatViewSet)
 routingChat.register(r'messages', MessageViewSet)
 
+# Recommender router (if needed)
+recommenderRouter = DefaultRouter()
+recommenderRouter.register(r'recommender', generate_user_embedding, basename='recommender')
+
+
 urlpatterns = [
     # Django methods
     path('login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
@@ -66,7 +73,9 @@ urlpatterns = [
     path('books/', BookView.as_view(), name='books'),
     path("movies/", MovieView.as_view(), name="movies"),
     path('audio/', AudioView.as_view(), name='audios'),
-    
+    path('generate_embeddings/', RecommenderViews.generate_user_embedding, name='register'),
+    path('recommend_users/', RecommenderViews.recommend_similar_users, name='register'),
+
     # Retrieve get_presigned_url
     #path('get_presigned_url/', views.get_presigned_url, name='get_presigned_url'),
 

@@ -43,6 +43,7 @@ from socialmedia.storage import get_s3_client, get_custom_s3_client
 from django.conf import settings
 User = get_user_model()
 
+
 class CustomItemPagination(PageNumberPagination):
     page_size = 10  # Number of items per page
     page_size_query_param = 'page_size'  # Allow dynamic page sizes
@@ -79,6 +80,22 @@ class CustomItemPagination(PageNumberPagination):
     page_size_query_param = 'page_size'  # Allow dynamic page sizes
     max_page_size = 50  # Limit max items per page
 
+# class PostViewSet(viewsets.ModelViewSet):
+#     queryset = Post.objects.all()
+#     serializer_class = PostSerializer
+#     permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
+#     pagination_class = CustomItemPagination
+
+#     def perform_create(self, serializer):
+#         """Set the user field to the authenticated user before saving."""
+#         serializer.save(user=self.request.user)
+#     # def get_queryset(self):
+#     #     limit = self.request.query_params.get('limit', 10)  # Default to 10 if not provided
+#     #     return Post.objects.all().order_by('-created_at')[:int(limit)]
+
+from django.db import connection
+import logging
+from recommenders.services.embedding_service import ModelService
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
@@ -87,12 +104,66 @@ class PostViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         """Set the user field to the authenticated user before saving."""
-        serializer.save(user=self.request.user)
-    # def get_queryset(self):
-    #     limit = self.request.query_params.get('limit', 10)  # Default to 10 if not provided
-    #     return Post.objects.all().order_by('-created_at')[:int(limit)]
-
-
+        post = serializer.save(user=self.request.user)
+        self.update_user_embedding(self.request.user)
+        return post
+    
+    def perform_update(self, serializer):
+        """Update the post and refresh user embedding."""
+        post = serializer.save()
+        # Only update embedding for significant content changes
+        if 'content' in serializer.validated_data or 'title' in serializer.validated_data:
+            self.update_user_embedding(post.user)
+        return post
+    
+    def perform_destroy(self, instance):
+        """Delete the post and refresh user embedding."""
+        user = instance.user
+        instance.delete()
+        self.update_user_embedding(user)
+    
+    def update_user_embedding(self, user):
+        """
+        Updates or creates the user's embedding vector based on their latest activity
+        """
+        try:
+            # Get the model service instance
+            model_service = ModelService.get_instance()
+            
+            # Generate a new embedding for the user
+            user_embedding = model_service.get_user_embedding(user.id)
+            
+            # Store or update the embedding in the database
+            with connection.cursor() as cursor:
+                # Convert the NumPy array to a PostgreSQL vector
+                vector_str = "{" + ",".join(str(x) for x in user_embedding.tolist()) + "}"
+                
+                # Check if user already has an embedding
+                cursor.execute(
+                    "SELECT id FROM user_embeddings WHERE user_id = %s",
+                    [user.id]
+                )
+                result = cursor.fetchone()
+                
+                if result:
+                    # Update existing embedding
+                    cursor.execute(
+                        "UPDATE user_embeddings SET embedding = %s::vector, updated_at = NOW() WHERE user_id = %s",
+                        [vector_str, user.id]
+                    )
+                else:
+                    # Insert new embedding
+                    cursor.execute(
+                        "INSERT INTO user_embeddings (user_id, embedding, created_at, updated_at) VALUES (%s, %s::vector, NOW(), NOW())",
+                        [user.id, vector_str]
+                    )
+            
+            logging.info(f"Updated embedding for user {user.id}")
+            return True
+            
+        except Exception as e:
+            logging.error(f"Error updating user embedding: {e}")
+            return False
 
 
 # @api_view(["GET"])

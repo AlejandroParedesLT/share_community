@@ -53,3 +53,7 @@ django-cors-headers
 
 pgvector
 
+
+tensorflow==2.15.0 # iF you are using GPU, otherwise use just tensorflow [and-cuda]
+tensorflow-recommenders==0.7.3
+# tensorflow-datasets
