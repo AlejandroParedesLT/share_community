@@ -16,7 +16,7 @@ services:
     ports:
       - "8001:8001"
     depends_on:
-      - postgres_db
+      - postgres_vector_db
       - minio
       - minio-client
       # - oracle_db
@@ -37,7 +37,7 @@ services:
   #   volumes:
   #     - ./data/postgres:/var/lib/postgresql/data
 
-  postgres_db:
+  postgres_vector_db: #VECTOR_DB
     image: ankane/pgvector:latest
     container_name: postgres_db
     restart: always
@@ -51,7 +51,7 @@ services:
       POSTGRES_USER: ${GLOBAL_USER}
       POSTGRES_PASSWORD: ${GLOBAL_PASSWORD}
     ports:
-      - "5431:5432"
+      - "5433:5432"
     volumes:
       - ./data/postgres:/var/lib/postgresql/data
 
@@ -87,7 +87,7 @@ services:
 
   minio:
     image: minio/minio
-    container_name: minio
+    container_name: minio_vector
     restart: always
     ports:
       - "9000:9000"   # MinIO API Port (S3-compatible)
@@ -153,3 +153,5 @@ volumes:
 
 #MINIO_ACCESS_KEY: ${AWS_ACCESS_KEY_ID}
 #MINIO_SECRET_KEY: ${AWS_SECRET_ACCESS_KEY}
+
+
