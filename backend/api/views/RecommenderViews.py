@@ -17,11 +17,6 @@ from rest_framework import viewsets
 import urllib.parse
 from django.db import connection, IntegrityError 
 
-import logging
-# Setting up logging
-log_file = './userposts_logs.log'
-logging.basicConfig(filename=log_file, level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-
 # Second method
 from django.db import connection
 from rest_framework.decorators import api_view, permission_classes
@@ -31,6 +26,10 @@ import logging
 from recommenders.services.embedding_service import ModelService
 from socialmedia.permissions import IsOwnerOrReadOnly  # Import the custom permission
 
+import logging
+# Setting up logging
+log_file = './userposts_logs.log'
+logging.basicConfig(filename=log_file, level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated, IsOwnerOrReadOnly])
@@ -62,8 +61,6 @@ def generate_user_embedding(request):
                 'message': 'Not enough user interaction data to generate embedding (minimum 5 required)'
             }, status=400)
         
-        # Get the model service instance (already initialized at startup)
-        from ...recommenders.services.embedding_service import ModelService
         model_service = ModelService.get_instance()
         
         # Generate the embedding (model is already loaded, so this is fast)
@@ -72,11 +69,11 @@ def generate_user_embedding(request):
         # Store the embedding
         with connection.cursor() as cursor:
             # Convert the NumPy array to a PostgreSQL vector
-            vector_str = "{" + ",".join(str(x) for x in user_embedding.tolist()) + "}"
+            vector_str = "[" + ",".join(str(x) for x in user_embedding.tolist()) + "]"
             
             # Check if user already has an embedding
             cursor.execute(
-                "SELECT id FROM user_embeddings WHERE user_id = %s",
+                "SELECT user_id FROM user_embeddings WHERE user_id = %s",
                 [user.id]
             )
             result = cursor.fetchone()
@@ -121,20 +118,20 @@ def recommend_similar_users(request):
         user = request.user
         limit = int(request.query_params.get('limit', 10))  # Default to 10 recommendations
         
-        # Check if user has enough interactions before generating embeddings
-        with connection.cursor() as cursor:
-            cursor.execute(
-                "SELECT COUNT(*) FROM socialmedia_itemuser WHERE user_id = %s",
-                [user.id]
-            )
-            interaction_count = cursor.fetchone()[0]
+        # # Check if user has enough interactions before generating embeddings
+        # with connection.cursor() as cursor:
+        #     cursor.execute(
+        #         "SELECT COUNT(*) FROM socialmedia_itemuser WHERE user_id = %s",
+        #         [user.id]
+        #     )
+        #     interaction_count = cursor.fetchone()[0]
         
-        if interaction_count < 5:  # Minimum interactions needed for a good embedding
-            return Response({
-                'error': '2',
-                'message': 'Not enough user interaction data to generate recommendations (minimum 5 required)',
-                'similar_users': []  # Return empty list instead of failing
-            }, status=200)  # Use 200 instead of 400 to handle gracefully
+        # if interaction_count < 5:  # Minimum interactions needed for a good embedding
+        #     return Response({
+        #         'error': '2',
+        #         'message': 'Not enough user interaction data to generate recommendations (minimum 5 required)',
+        #         'similar_users': []  # Return empty list instead of failing
+        #     }, status=200)  # Use 200 instead of 400 to handle gracefully
             
         # Check if user has an embedding
         with connection.cursor() as cursor:
@@ -153,7 +150,7 @@ def recommend_similar_users(request):
                 
                 # Store the embedding for future use
                 with connection.cursor() as cursor:
-                    vector_str = "{" + ",".join(str(x) for x in user_embedding.tolist()) + "}"
+                    vector_str = "[" + ",".join(str(x) for x in user_embedding.tolist()) + "]"
                     
                     cursor.execute(
                         "INSERT INTO user_embeddings (user_id, embedding, created_at, updated_at) VALUES (%s, %s::vector, NOW(), NOW())",
@@ -181,7 +178,7 @@ def recommend_similar_users(request):
                     u.username,
                     u.first_name,
                     u.last_name,
-                    p.profile_picture_url,
+                    p.profile_picture,
                     p.bio,
                     1 - (e.embedding <=> %s::vector) as similarity_score
                 FROM user_embeddings e

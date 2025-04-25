@@ -10,7 +10,7 @@ import urllib.parse
 import ast  # For safely evaluating the string representation of Python lists
 
 # Configuration
-CSV_FILE_PATH = "./artifacts/spotify_dataset_with_description.csv"
+CSV_FILE_PATH = "./sqlScripts/artifacts/spotify_dataset_with_description.csv"
 API_BASE_URL = "http://localhost:8001/api"
 LOGIN_ENDPOINT = f"{API_BASE_URL}/login/"
 ITEMS_ENDPOINT = f"{API_BASE_URL}/items/"

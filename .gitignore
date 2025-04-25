@@ -298,3 +298,6 @@ gradle-app.setting
 .nfs*
 
 artifacts/
+
+*.log
+*.csv

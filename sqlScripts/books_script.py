@@ -8,7 +8,7 @@ import json
 import re
 
 # Configuration
-CSV_FILE_PATH = "./artifacts/books_original.csv"  # Update this to your CSV file path
+CSV_FILE_PATH = "./sqlScripts/artifacts/books_original.csv"  # Update this to your CSV file path
 API_BASE_URL = "http://localhost:8001/api"  # Base API URL
 LOGIN_ENDPOINT = f"{API_BASE_URL}/login/"  # Login endpoint
 ITEMS_ENDPOINT = f"{API_BASE_URL}/items/"  # Items endpoint
@@ -139,6 +139,7 @@ def load_books_from_csv(auth_token, image_map):
                 # Extract other fields
                 description = row.get("description", "")
                 publisher = row.get("publisher", "")
+                original_id = row.get("original_id", "")
                 print(genre_id)
                 # Create multipart form data for non-file fields
                 form_data = {

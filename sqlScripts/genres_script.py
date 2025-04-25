@@ -8,15 +8,15 @@ import chardet   # For detecting file encoding
 API_BASE_URL = "http://localhost:8001/api"  # Base API URL
 LOGIN_ENDPOINT = f"{API_BASE_URL}/login/"  # Login endpoint
 GENRE_ENDPOINT = f"{API_BASE_URL}/genres/"  # Genres endpoint
-
+base_dir = "./sqlScripts/artifacts"  # Base directory for CSV files
 # Authentication credentials
 USERNAME = "admin"  # Replace with your username
 PASSWORD = "adminpassword"  # Replace with your password
 
 # CSV file paths
-MOVIE_CSV_PATH = "movie_records.csv"  # Replace with your movie CSV file path
-BOOK_CSV_PATH = "books_original.csv"        # Replace with your book CSV file path
-MUSIC_CSV_PATH = "spotify_dataset_final.csv"  # Replace with your music CSV file path
+MOVIE_CSV_PATH = f"{base_dir}/movie_records.csv"  # Replace with your movie CSV file path
+BOOK_CSV_PATH = f"{base_dir}/books_original.csv"        # Replace with your book CSV file path
+MUSIC_CSV_PATH = f"{base_dir}/spotify_dataset_with_description.csv"  # Replace with your music CSV file path
 
 # Column names for each CSV file
 MOVIE_GENRE_COLUMN = "genre"

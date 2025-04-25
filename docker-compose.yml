@@ -42,7 +42,7 @@ services:
     container_name: postgres_db
     restart: always
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "${GLOBAL_USER}"]
+      test: ["CMD", "pg_isready", "-U", "${GLOBAL_USER}", "-d", "mydatabase"]
       interval: 5s
       timeout: 5s
       retries: 5

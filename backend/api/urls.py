@@ -54,8 +54,8 @@ routingChat.register(r'chats', ChatViewSet)
 routingChat.register(r'messages', MessageViewSet)
 
 # Recommender router (if needed)
-recommenderRouter = DefaultRouter()
-recommenderRouter.register(r'recommender', generate_user_embedding, basename='recommender')
+# recommenderRouter = DefaultRouter()
+# recommenderRouter.register(r'recommender', generate_user_embedding, basename='recommender')
 
 
 urlpatterns = [
