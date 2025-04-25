@@ -15,7 +15,7 @@ PASSWORD = "adminpassword"  # Replace with your password
 
 # CSV file paths
 MOVIE_CSV_PATH = "movie_records.csv"  # Replace with your movie CSV file path
-BOOK_CSV_PATH = "books_2k.csv"        # Replace with your book CSV file path
+BOOK_CSV_PATH = "books_for_db.csv"        # Replace with your book CSV file path
 MUSIC_CSV_PATH = "spotify_dataset_final.csv"  # Replace with your music CSV file path
 
 # Column names for each CSV file
