@@ -9,12 +9,16 @@ import Posts from "./pages/Posts";
 import PostPost from "./pages/PostPost";
 import UserProfile from "./pages/Profile";
 import ItemDetails from "./pages/ViewItem";
+import SignUp from "./pages/Signup";
+import Preferences from "./pages/Preferences";
 
 function App() {
   return (
       <Router>
           <Routes>
-              <Route path="/" element={<Login />} /> {/* Redirect to Login first */}
+              <Route path="/home" element={<Login />} /> {/* Redirect to Login first */}
+              <Route path="/signup" element={<SignUp />} />
+              <Route path="/preferences" element={<Preferences />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/items" element={<Items />} />
               <Route path="/post-item" element={<PostItem />} /> {/* Add Post Item route */}

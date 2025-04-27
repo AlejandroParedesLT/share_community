@@ -4,7 +4,8 @@ import { useNavigate, useParams } from "react-router-dom";
 
 function Profile() {
     const [user, setUser] = useState(null);
-    const [posts, setPosts] = useState([]);  // State for posts
+    const [posts, setPosts] = useState([]);
+    const [isLoaded, setIsLoaded] = useState(false);
     const navigate = useNavigate();
     const { id } = useParams();
     const API_URL = "http://localhost:8001";
@@ -18,20 +19,55 @@ function Profile() {
 
     const styles = {
         pageContainer: {
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            width: '100vw',
-            height: '100vh',
-            backgroundColor: '#f0f2f5',
+            width: "100%",
+            minHeight: "100vh",
             fontFamily: '"Segoe UI", Roboto, Helvetica, Arial, sans-serif',
+            backgroundColor: '#f0f2f5',
             overflowY: 'auto',
-            padding: '20px',
-            boxSizing: 'border-box',
+        },
+        navBar: {
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            backgroundColor: '#c4ede7',
+            padding: '1rem 2rem',
+            boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+        },
+        navLogoContainer: {
+            display: 'flex',
+            alignItems: 'center',
+        },
+        navLogo: {
+            width: '40px',
+            height: '40px',
+            marginRight: '10px',
+        },
+        navTitle: {
+            fontSize: '1.75rem',
+            fontFamily: '"Montserrat", "Segoe UI", sans-serif',
+            fontWeight: '700',
+            color: '#1a3c34',
+            margin: 0,
+            letterSpacing: '0.5px',
+        },
+        backButton: {
+            backgroundColor: '#c4ede7',
+            color: '#1a3c34',
+            border: '1px solid #1a3c34',
+            borderRadius: '0.375rem',
+            padding: '0.75rem 1rem',
+            fontSize: '1rem',
+            fontWeight: '500',
+            cursor: 'pointer',
+            transition: 'background-color 0.2s ease, transform 0.1s ease',
         },
         container: {
             maxWidth: '1200px',
-            margin: '0 auto',
+            margin: '30px auto',
+            padding: '0 20px',
+            transition: 'opacity 0.8s ease-in-out, transform 0.8s ease-in-out',
+            opacity: isLoaded ? 1 : 0,
+            transform: isLoaded ? "translateY(0)" : "translateY(20px)",
         },
         header: {
             display: 'flex',
@@ -40,24 +76,19 @@ function Profile() {
             marginBottom: '30px',
         },
         title: {
-            fontSize: '24px',
+            fontSize: '1.5rem',
             fontWeight: '600',
-            color: '#1c1e21',
-        },
-        backButton: {
-            padding: '10px 15px',
-            backgroundColor: '#0095f6',
-            color: 'white',
-            border: 'none',
-            borderRadius: '8px',
-            cursor: 'pointer',
-            fontWeight: '600',
+            color: '#2D3748',
         },
         profileInfo: {
             display: 'flex',
             alignItems: 'center',
             gap: '20px',
-            marginBottom: '20px',
+            marginBottom: '30px',
+            backgroundColor: 'white',
+            padding: '30px',
+            borderRadius: '12px',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
         },
         avatar: {
             width: '80px',
@@ -79,7 +110,7 @@ function Profile() {
         },
         details: {
             fontSize: '16px',
-            color: '#1c1e21',
+            color: '#4B5563',
         },
         gridContainer: {
             display: 'grid',
@@ -109,11 +140,11 @@ function Profile() {
             fontSize: '18px',
             fontWeight: '600',
             marginBottom: '10px',
-            color: '#1c1e21',
+            color: '#2D3748',
         },
         postMeta: {
             fontSize: '14px',
-            color: '#65676b',
+            color: '#6B7280',
             marginBottom: '15px',
         },
         userInfo: {
@@ -133,20 +164,24 @@ function Profile() {
             fontWeight: 'bold',
         },
         postText: {
-            color: '#1c1e21',
+            color: '#4B5563',
             marginBottom: '15px',
         },
         noPostsMessage: {
             textAlign: 'center',
-            color: '#65676b',
+            color: '#6B7280',
             fontSize: '18px',
             marginTop: '50px',
+            backgroundColor: 'white',
+            padding: '30px',
+            borderRadius: '12px',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
         },
         associatedItemsTitle: {
             fontSize: '16px',
             fontWeight: '600',
             marginBottom: '10px',
-            color: '#1c1e21',
+            color: '#2D3748',
         },
         associatedItemHover: {
             transform: 'scale(1.05)',
@@ -154,13 +189,14 @@ function Profile() {
         associatedItem: {
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'space-between',  // Ensure items are spaced out
+            justifyContent: 'space-between',
             backgroundColor: 'black',
             color: 'white',
             padding: '10px',
             borderRadius: '8px',
             marginBottom: '10px',
             transition: 'transform 0.3s ease',
+            cursor: 'pointer',
         },
         associatedItemImage: {
             width: '50px',
@@ -169,9 +205,9 @@ function Profile() {
             borderRadius: '8px',
         },
         recentPostsHeader: {
-            fontSize: '24px',
+            fontSize: '1.25rem',
             fontWeight: '600',
-            color: '#1c1e21',
+            color: '#2D3748',
             marginBottom: '20px',
             borderBottom: '2px solid #ddd',
             paddingBottom: '10px',
@@ -183,7 +219,9 @@ function Profile() {
             navigate("/");
         } else {
             fetchUserProfile();
-            fetchUserPosts();  // Fetch posts after the profile
+            fetchUserPosts();
+            // Set isLoaded to true after a short delay to trigger animations
+            setTimeout(() => setIsLoaded(true), 100);
         }
     }, [token, navigate, id]);
 
@@ -205,15 +243,9 @@ function Profile() {
                 headers: { Authorization: `Bearer ${token}` },
             });
             
-            // Log the response to inspect its structure
-            console.log("Response Data:", response.data);
-    
-            // Access posts from the 'results' array
             const postsData = response.data.results || [];
     
-            // Ensure postsData is an array
             if (Array.isArray(postsData)) {
-                // Sort posts in reverse chronological order
                 const sortedPosts = postsData.sort((a, b) => 
                     new Date(b.created_at) - new Date(a.created_at)
                 );
@@ -227,7 +259,6 @@ function Profile() {
         }
     };
     
-
     // Helper function to get initials and randomize color
     const getInitialsAndColor = (name) => {
         const generateColor = (input) => {
@@ -253,12 +284,33 @@ function Profile() {
 
     return (
         <div style={styles.pageContainer}>
+            {/* Navigation Bar */}
+            <div style={styles.navBar}>
+                <div style={styles.navLogoContainer}>
+                    <img 
+                        src="https://i.pinimg.com/736x/12/1e/3c/121e3c7353b6c0c7ed5b8913918bc8bc.jpg" 
+                        alt="Pizza icon" 
+                        style={styles.navLogo} 
+                    />
+                    <h1 style={styles.navTitle}>Slice of Life</h1>
+                </div>
+                <button 
+                    style={styles.backButton}
+                    onClick={() => navigate("/dashboard")}
+                    onMouseEnter={(e) => {
+                        e.target.style.backgroundColor = '#b0e0d6';
+                    }}
+                    onMouseLeave={(e) => {
+                        e.target.style.backgroundColor = '#c4ede7';
+                    }}
+                >
+                    Back to Dashboard
+                </button>
+            </div>
+
             <div style={styles.container}>
                 <div style={styles.header}>
                     <h2 style={styles.title}>Profile</h2>
-                    <button onClick={() => navigate("/dashboard")} style={styles.backButton}>
-                        Back to Dashboard
-                    </button>
                 </div>
 
                 {user ? (
@@ -347,7 +399,7 @@ function Profile() {
                                                     <div 
                                                         key={item.precordsid} 
                                                         style={styles.associatedItem}
-                                                        onClick={() => navigate(`/view-item/${item.precordsid}`)} // Redirect to view-item with precordsid
+                                                        onClick={() => navigate(`/view-item/${item.precordsid}`)}
                                                         onMouseEnter={(e) => {
                                                             e.currentTarget.style.transform = styles.associatedItemHover.transform;
                                                         }}
