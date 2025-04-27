@@ -19,27 +19,28 @@ function PostPost() {
             left: 0,
             width: '100vw',
             height: '100vh',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            backgroundColor: '#f0f2f5',
-            fontFamily: '"Segoe UI", Roboto, Helvetica, Arial, sans-serif',
+            backgroundColor: '#c4ede7',
+            fontFamily: 'Arial', //'Segoe UI, Roboto, Helvetica, Arial, sans-serif',
             margin: 0,
-            padding: 0,
+            paddingTop: '0px',
             boxSizing: 'border-box',
-            overflow: 'hidden',
+            overflow: 'auto',
+            justifyContent: 'flex-start',
+            alignItems: 'center',
+            display: 'flex',
+            flexDirection: 'column'
         },
         container: {
             width: "100%",
             maxWidth: "600px",
-            backgroundColor: "#ffffff",
-            border: "1px solid #dddfe2",
+            backgroundColor: 'white',
+            //border: "1px solid #dddfe2",
             borderRadius: "12px",
             padding: "40px",
-            boxShadow: "0 6px 8px rgba(0,0,0,0.1)",
+            //boxShadow: "0 6px 8px rgba(0,0,0,0.1)",
             maxHeight: '90vh',
             overflowY: 'auto',
-        
+            marginTop: '20px',
             // Centering styles
             display: "flex",
             flexDirection: "column", // Align items in a column
@@ -47,20 +48,80 @@ function PostPost() {
             alignItems: "center", // Center horizontally
             textAlign: "center" // Ensures text alignment is centered
         },
+        createAccount: {
+            marginTop: "0rem",
+            textAlign: "center",
+            fontSize: "0.875rem",
+            color: "#6B7280",
+            transition: "transform 0.3s ease, opacity 0.3s ease",
+            transitionDelay: "0.2s",
+        },
+        navBar: {
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            padding: '10px 20px',
+            backgroundColor: '#c4ede7',
+            boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+            width: '100%',
+            boxSizing: 'border-box',
+            position: 'sticky',
+            top: 0,
+            zIndex: 100,
+        },
+        navLeft: {
+            display: 'flex',
+            alignItems: 'center', 
+            gap: '15px',
+        },
+        navLogo: {
+            width: '40px',
+            height: '40px',
+            borderRadius: '8px',
+            objectFit: 'contain',
+            transition: "transform 0.5s ease-in-out",
+            animation: "bounce 0.75s infinite",
+        },
+        navText: {
+            fontSize: '18px',
+            fontWeight: '600',
+            color: '#1c1e21',
+        },
+        navRight: {
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px',
+        },
+        backButton: {
+            width: '120px',
+            padding: '10px 0px',
+            backgroundColor: '#3c413a',
+            color: 'white',
+            border: 'none',
+            borderRadius: '8px',
+            cursor: 'pointer',
+            fontWeight: '600',
+            textAlign: 'center',
+            whiteSpace: 'nonwrap',
+        },
         textarea: {
             width: "calc(100% - 30px)",
             padding: "15px", 
             marginBottom: "20px", 
             marginLeft: '15px', 
             marginRight: '15px', 
-            border: "1px solid black",
+            border: "1px solid #D1D5DB",
             borderRadius: "8px",
             fontSize: "16px",
-            color: 'white',
-            backgroundColor: 'black',
+            color: 'black',
+            backgroundColor: 'white',
             boxSizing: 'border-box', 
             resize: 'vertical',
             position: 'relative',
+            fontFamily: "Arial",
+            //border: "2px solid #D1D5DB",
+            borderRadius: "0.375rem",
+            fontSize: "1rem",
         },
         fileInput: {
             display: 'none',
@@ -68,7 +129,7 @@ function PostPost() {
         uploadButton: {
             display: 'inline-block',  // Only as wide as its content
             padding: '10px 15px', // Adjust padding for better sizing
-            backgroundColor: '#8A3AB9', 
+            backgroundColor: '#3c413a', 
             color: 'white',
             border: 'none',
             borderRadius: '8px',
@@ -85,11 +146,12 @@ function PostPost() {
             marginBottom: "25px", 
             marginLeft: '15px', 
             marginRight: '15px', 
-            border: "1px solid #0095f6",
+            border: "1px solid #D1D5DB",
             borderRadius: "8px",
             fontSize: "16px",
-            color: 'white',
-            backgroundColor: 'black',
+            color: 'black',
+            fontFamily: "Arial",
+            backgroundColor: 'white',
             appearance: 'none',
             boxSizing: 'border-box',
             backgroundImage: 'url("data:image/svg+xml;utf8,<svg fill=\'white\' height=\'24\' viewBox=\'0 0 24 24\' width=\'24\' xmlns=\'http://www.w3.org/2000/svg\'><path d=\'M7 10l5 5 5-5z\'/><path d=\'M0 0h24v24H0z\' fill=\'none\'/></svg>")',
@@ -99,7 +161,7 @@ function PostPost() {
         button: {
             width: "calc(100% - 30px)",
             padding: '15px', 
-            backgroundColor: '#0095f6',
+            backgroundColor: '#3c413a',
             color: 'white',
             border: 'none',
             borderRadius: '8px',
@@ -111,6 +173,7 @@ function PostPost() {
             marginRight: '15px', 
             boxSizing: 'border-box',
         },
+        
     };
 
     useEffect(() => {
@@ -186,15 +249,28 @@ function PostPost() {
 
     return (
         <div style={styles.pageContainer}>
+            {/* Add this style tag if you don't want to create a separate CSS file */}
+            <style>
+                {`
+                @keyframes bounce {
+                    0%, 100% { transform: translateY(0); }
+                    50% { transform: translateY(-3px); }
+                }
+                .bouncing-logo {
+                    animation: bounce 0.75s infinite;
+                }
+                `}
+            </style>
+            
             <div style={styles.container}>
                 <h2 style={{
                     textAlign: 'center',
                     marginBottom: '30px', 
                     color: '#1c1e21',
-                    fontSize: '18px',
-                    fontWeight: '600',
+                    fontSize: '20px',
+                    fontWeight: '550',
                 }}>
-                    Create New Post
+                    Share Something You've Read, Listened to, Or Watched Lately!
                 </h2>
                 <form onSubmit={handleSubmit}>
                     <input
@@ -206,7 +282,7 @@ function PostPost() {
                         style={styles.textarea}
                     />
                     <textarea
-                        placeholder="What's on your mind?"
+                        placeholder="What's on Your Mind?"
                         value={content}
                         onChange={(e) => setContent(e.target.value)}
                         style={styles.textarea}
@@ -221,7 +297,7 @@ function PostPost() {
                         accept="image/*"
                     />
                     <label htmlFor="fileInput" style={styles.uploadButton}>
-                        {image ? image.name : "Upload Image"}
+                        {image ? image.name : "Attach an Image to Your Post"}
                     </label>
 
                     <select 
@@ -296,13 +372,43 @@ function PostPost() {
                             ))}
                         </div>
                     )}
+                    <p style={styles.createAccount}>
+                Don't see an item you're looking for?{" "}
+                <a
+                  href="#"
+                  color="#4B5563"
+                  onClick={(e) => {
+                    e.preventDefault()
+                    navigate("/post-item")
+                  }}
+                  onMouseOver={(e) => {
+                    e.target.style.color = "#4B5563"
+                    e.target.style.textDecoration = "underline"
+                  }}
+                  onMouseOut={(e) => {
+                    e.target.style.color = "#4B5563"
+                    e.target.style.textDecoration = "none"
+                  }}
+                >
+                  Suggest it to us here
+                </a>
+              </p>
 
-                    <button 
-                        type="submit" 
-                        style={styles.button}
-                    >
-                        Create Post
-                    </button>
+                    <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginTop: '10px' }}>
+                        <button 
+                            type="button" 
+                            style={{ ...styles.button, width: 'auto', flex: 1 }}
+                            onClick={() => navigate("/dashboard")}
+                        >
+                            Cancel
+                        </button>
+                        <button 
+                            type="submit" 
+                            style={{ ...styles.button, width: 'auto', flex: 1 }}
+                        >
+                            Create Post
+                        </button>
+                    </div>
                 </form>
             </div>
         </div>

@@ -10,16 +10,8 @@ function Posts() {
 
     // Color palette for avatars
     const avatarColors = [
-        '#0095f6',   // Original blue
-        '#5B4FD8',   // Purple
-        '#E1306C',   // Instagram pink
-        '#FF6B6B',   // Coral red
-        '#4ECDC4',   // Teal
-        '#45B7D1',   // Bright blue
-        '#F9D56E',   // Soft yellow
-        '#FF8C42',   // Orange
-        '#6A5ACD',   // Slate blue
-        '#2A9D8F',   // Teal green
+        '#0095f6', '#5B4FD8', '#E1306C', '#FF6B6B', '#4ECDC4',
+        '#45B7D1', '#F9D56E', '#FF8C42', '#6A5ACD', '#2A9D8F',
     ];
 
     const styles = {
@@ -29,35 +21,75 @@ function Posts() {
             left: 0,
             width: '100vw',
             height: '100vh',
-            backgroundColor: '#f0f2f5',
+            backgroundColor: '#fdfffc',
             fontFamily: '"Segoe UI", Roboto, Helvetica, Arial, sans-serif',
             overflowY: 'auto',
-            padding: '20px',
+            padding: '0',
             boxSizing: 'border-box',
+        },
+        navBar: {
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            padding: '10px 20px',
+            backgroundColor: '#c4ede7',
+            boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+            width: '100%',
+            boxSizing: 'border-box',
+            position: 'sticky',
+            top: 0,
+            zIndex: 100,
+        },
+        navLeft: {
+            display: 'flex',
+            alignItems: 'center', 
+            gap: '15px',
+        },
+        navLogo: {
+            width: '40px',
+            height: '40px',
+            borderRadius: '8px',
+            objectFit: 'contain',
+            transition: "transform 0.5s ease-in-out",
+            animation: "bounce 0.75s infinite",
+        },
+        navText: {
+            fontSize: '18px',
+            fontWeight: '600',
+            color: '#1c1e21',
+        },
+        navRight: {
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px',
         },
         container: {
             maxWidth: '1200px',
             margin: '0 auto',
+            padding: '20px',
         },
         header: {
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
-            marginBottom: '30px',
+            marginBottom: '20px',
         },
         title: {
             fontSize: '24px',
-            fontWeight: '600',
+            fontWeight: '550',
             color: '#1c1e21',
         },
         backButton: {
-            padding: '10px 15px',
-            backgroundColor: '#0095f6',
+            width: '120px',
+            padding: '10px 0px',
+            backgroundColor: '#3c413a',
             color: 'white',
             border: 'none',
             borderRadius: '8px',
             cursor: 'pointer',
             fontWeight: '600',
+            textAlign: 'center',
+            whiteSpace: 'nonwrap',
         },
         gridContainer: {
             display: 'grid',
@@ -98,7 +130,6 @@ function Posts() {
             display: 'flex',
             alignItems: 'center',
             marginBottom: '15px',
-            color: '#1c1e21',
         },
         userAvatar: {
             width: '40px',
@@ -146,6 +177,15 @@ function Posts() {
             color: '#65676b',
             fontSize: '18px',
             marginTop: '50px',
+        },
+        recentPostsHeader: {
+            textAlign: 'center',
+            fontSize: '24px',
+            fontWeight: '550',
+            color: '#1c1e21',
+            marginTop: '20px',
+            marginBottom: '20px',
+            paddingBottom: '10px',
         }
     };
 
@@ -227,15 +267,43 @@ function Posts() {
 
     return (
         <div style={styles.pageContainer}>
-            <div style={styles.container}>
-                <div style={styles.header}>
-                    <h2 style={styles.title}>Posts</h2>
-                    <button 
-                        onClick={() => navigate("/dashboard")} 
-                        style={styles.backButton}
-                    >
-                        Back to Dashboard
+            {/* Add this style tag if you don't want to create a separate CSS file */}
+            <style>
+                {`
+                @keyframes bounce {
+                    0%, 100% { transform: translateY(0); }
+                    50% { transform: translateY(-3px); }
+                }
+                .bouncing-logo {
+                    animation: bounce 0.75s infinite;
+                }
+                `}
+            </style>
+
+            {/* Navigation Bar */}
+            <div style={styles.navBar}>
+                <div style={styles.navLeft}>
+                    <img src="https://i.pinimg.com/736x/12/1e/3c/121e3c7353b6c0c7ed5b8913918bc8bc.jpg" alt="Logo" style={styles.navLogo} className='bouncing-logo' />
+                    <span style={styles.navText}>Slice of Life</span>
+                </div>
+                <div style={styles.navRight}>
+                    <button onClick={() => navigate("/create-post")} style={styles.backButton}>
+                        Make Post!
                     </button>
+                    <button onClick={() => navigate("/posts")} style={styles.backButton}>
+                        Your Feed
+                    </button>
+                    <button onClick={() => navigate("/dashboard")} style={styles.backButton}>
+                        Home
+                    </button>
+                </div>
+            </div>
+
+            <div style={styles.container}>
+
+                {/* Feed Header */}
+                <div style={styles.recentPostsHeader}>
+                    What Are Other Slicers Posting About?  
                 </div>
 
                 {posts.length === 0 ? (

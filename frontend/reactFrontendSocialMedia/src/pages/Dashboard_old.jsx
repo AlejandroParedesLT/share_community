@@ -76,21 +76,33 @@ function Dashboard() {
             transition: 'background-color 0.3s ease, transform 0.2s ease',
         },
         buttonHover: {
-            backgroundColor: '#7dacbf',
+            backgroundColor: '#0077cc',
             transform: 'scale(1.05)',
         },
-        pizza: {
+        pizzaLeft: {
             position: 'absolute',
-            width: '100px',
-            height: '100px',
-            objectFit: 'cover',
+            left: '5%',
+            top: '50%',
+            transform: 'translateY(-50%)',
+            width: '300px',
+            height: '350px',
+            animation: 'bouncePizzaLeft 2s ease-in-out infinite',
             zIndex: 1,
-            animation: 'fallingPizza 4s linear infinite',
         },
+        pizzaRight: {
+            position: 'absolute',
+            right: '5%',
+            top: '50%',
+            transform: 'translateY(-50%)',
+            width: '300px',
+            height: '350px',
+            animation: 'bouncePizzaRight 2.5s ease-in-out infinite',
+            zIndex: 1,
+        }
     };
 
-    const pizzaImageUrl = "https://png.pngtree.com/png-clipart/20230810/original/pngtree-whole-pizza-theme-image-1-salami-round-clipart-vector-picture-image_10258146.png";
-    const pizzaCount = 7; // Number of pizzas raining down
+    const pizzaImageUrl = "https://i.pinimg.com/736x/12/1e/3c/121e3c7353b6c0c7ed5b8913918bc8bc.jpg";
+    const pizzaCount = 2; // Number of pizzas on each side
 
     return (
         <div style={styles.pageContainer}>
@@ -100,27 +112,45 @@ function Dashboard() {
                         0% { filter: hue-rotate(0deg); }
                         100% { filter: hue-rotate(360deg); }
                     }
-
-                    @keyframes fallingPizza {
-                        0% {
-                            transform: translateY(-120vh) rotate(0deg); /* Start from above the viewport */
-                        }
-                        100% {
-                            transform: translateY(100vh) rotate(360deg); /* End at the bottom of the page */
-                        }
+                    
+                    @keyframes bouncePizzaLeft {
+                        0%, 100% { transform: translate(0, -50%); }
+                        50% { transform: translate(0, -70%); }
+                    }
+                    
+                    @keyframes bouncePizzaRight {
+                        0%, 100% { transform: translate(0, -50%); }
+                        50% { transform: translate(0, -70%); }
                     }
                 `}
             </style>
 
-            {/* Pizzas falling */}
+            {/* Pizzas on the left */}
             {[...Array(pizzaCount)].map((_, i) => (
-                <div
-                    key={`pizza-${i}`}
+                <div 
+                    key={`left-pizza-${i}`} 
                     style={{
-                        ...styles.pizza,
-                        left: `${Math.random() * 100 - 5}%`, // Randomize the starting position
-                        animationDuration: `${Math.random() * 10 + 5}s`, // Vary animation speed
-                        animationDelay: `${Math.random() * 3}s`, // Random delay for staggered start
+                        ...styles.pizzaLeft,
+                        left: `${5 + (0 * 7)}%`,
+                        top: `${25 + (i * 60)}%`,
+                        fontSize: `${40 + (i * 10)}px`,
+                        animationDelay: `${i * 0.3}s`
+                    }}
+                >
+                    <img src={pizzaImageUrl} alt="Pizza" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                </div>
+            ))}
+
+            {/* Pizzas on the right */}
+            {[...Array(pizzaCount)].map((_, i) => (
+                <div 
+                    key={`right-pizza-${i}`} 
+                    style={{
+                        ...styles.pizzaRight,
+                        right: `${5 + (0 * 7)}%`,
+                        top: `${20 + (i * 60)}%`,
+                        fontSize: `${40 + (i * 10)}px`,
+                        animationDelay: `${i * 0.3}s`
                     }}
                 >
                     <img src={pizzaImageUrl} alt="Pizza" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
