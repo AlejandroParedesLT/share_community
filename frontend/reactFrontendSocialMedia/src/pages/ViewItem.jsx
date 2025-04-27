@@ -190,6 +190,18 @@ function ItemDetails() {
 
     return (
         <div style={styles.pageContainer}>
+              {/* Add this style tag if you don't want to create a separate CSS file */}
+              <style>
+                {`
+                @keyframes bounce {
+                    0%, 100% { transform: translateY(0); }
+                    50% { transform: translateY(-3px); }
+                }
+                .bouncing-logo {
+                    animation: bounce 0.75s infinite;
+                }
+                `}
+            </style>
             {/* Navigation Bar */}
             <div style={styles.navBar}>
                 <div style={styles.navLeft}>
