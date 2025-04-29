@@ -1,12 +1,16 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import PostPostModal from "./PostPost";
+
 
 function Posts() {
     const [posts, setPosts] = useState([]);
     const navigate = useNavigate();
     const API_URL = "http://localhost:8001";
     const token = localStorage.getItem("accessToken");
+    const [isModalOpen, setModalOpen] = useState(false);
+
 
     // Color palette for avatars
     const avatarColors = [
@@ -280,6 +284,13 @@ function Posts() {
                 `}
             </style>
 
+            {/* Show the post modal if open */}
+            <PostPostModal 
+                isOpen={isModalOpen}
+                onClose={() => setModalOpen(false)}
+                navigate={navigate}
+            />
+
             {/* Navigation Bar */}
             <div style={styles.navBar}>
                 <div style={styles.navLeft}>
@@ -287,7 +298,7 @@ function Posts() {
                     <span style={styles.navText}>Slice of Life</span>
                 </div>
                 <div style={styles.navRight}>
-                    <button onClick={() => navigate("/create-post")} style={styles.backButton}>
+                    <button onClick={() => setModalOpen(true)} style={styles.backButton}>
                         Make Post!
                     </button>
                     <button onClick={() => navigate("/posts")} style={styles.backButton}>

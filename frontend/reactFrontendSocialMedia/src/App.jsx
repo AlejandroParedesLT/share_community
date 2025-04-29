@@ -6,7 +6,7 @@ import Items from "./pages/Items";
 import Login from "./pages/Login"; 
 import PostItem from "./pages/PostItem"; // Import the new components
 import Posts from "./pages/Posts";
-import PostPost from "./pages/PostPost";
+import PostPost from "./pages/PostPost_old";
 import UserProfile from "./pages/Profile";
 import ItemDetails from "./pages/ViewItem";
 import SignUp from "./pages/Signup";

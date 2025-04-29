@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
+import PostPostModal from "./PostPost";
 
 const hashStringToColor = (str) => {
     let hash = 0;
@@ -28,6 +29,8 @@ function ItemDetails() {
     const { precordsid } = useParams(); // Use precordsid from the URL params
     const API_URL = "http://localhost:8001";
     const token = localStorage.getItem("accessToken");
+    const [isModalOpen, setModalOpen] = useState(false);
+    
 
     const styles = {
         pageContainer: {
@@ -190,8 +193,8 @@ function ItemDetails() {
 
     return (
         <div style={styles.pageContainer}>
-              {/* Add this style tag if you don't want to create a separate CSS file */}
-              <style>
+            {/* Add this style tag if you don't want to create a separate CSS file */}
+            <style>
                 {`
                 @keyframes bounce {
                     0%, 100% { transform: translateY(0); }
@@ -202,6 +205,12 @@ function ItemDetails() {
                 }
                 `}
             </style>
+            {/* Show the post modal if open */}
+            <PostPostModal 
+                isOpen={isModalOpen}
+                onClose={() => setModalOpen(false)}
+                navigate={navigate}
+            />
             {/* Navigation Bar */}
             <div style={styles.navBar}>
                 <div style={styles.navLeft}>
@@ -209,15 +218,15 @@ function ItemDetails() {
                     <span style={styles.navText}>Slice of Life</span>
                 </div>
                 <div style={styles.navRight}>
-                    <button onClick={() => navigate("/create-post")} style={styles.backButton}>
-                        Make Post!
+                  <button onClick={() => setModalOpen(true)} style={styles.backButton}>
+                    Make Post!
+                  </button>
+                  <button onClick={() => navigate("/posts")} style={styles.backButton}>
+                    Your Feed
                     </button>
-                    <button onClick={() => navigate("/posts")} style={styles.backButton}>
-                        Your Feed
-                    </button>
-                    <button onClick={() => navigate("/dashboard")} style={styles.backButton}>
-                        Home
-                    </button>
+                <button onClick={() => navigate("/dashboard")} style={styles.backButton}>
+                    Home   
+                  </button>  
                 </div>
             </div>
             

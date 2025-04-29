@@ -1,9 +1,12 @@
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
+import PostPostModal from "./PostPost";
 
 function Dashboard() {
     const navigate = useNavigate();
     const [username, setUsername] = useState("User");
+    const [isModalOpen, setModalOpen] = useState(false);
+
 
     useEffect(() => {
         // Try to get username from local storage
@@ -112,6 +115,14 @@ function Dashboard() {
                 `}
             </style>
 
+            {/* Show the post modal if open */}
+            <PostPostModal 
+                isOpen={isModalOpen}
+                onClose={() => setModalOpen(false)}
+                navigate={navigate}
+            />
+
+
             {/* Pizzas falling */}
             {[...Array(pizzaCount)].map((_, i) => (
                 <div
@@ -176,7 +187,7 @@ function Dashboard() {
                         View Your Feed
                     </button>
                     <button
-                        onClick={() => navigate("/create-post")}
+                        onClick={() => setModalOpen(true)}
                         style={styles.button}
                         onMouseEnter={(e) => {
                             e.target.style.backgroundColor = styles.buttonHover.backgroundColor;

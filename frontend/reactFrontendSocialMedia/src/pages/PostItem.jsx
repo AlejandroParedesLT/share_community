@@ -8,7 +8,7 @@ function PostItem() {
     const [publishDate, setPublishDate] = useState("");
     const [image, setImage] = useState(null);
     const navigate = useNavigate();
-    const API_URL = "http://localhost:8001"; // Adjust as needed
+    const API_URL = "http://localhost:8001";
     const token = localStorage.getItem("accessToken");
 
     const styles = {
@@ -23,8 +23,8 @@ function PostItem() {
             margin: 0,
             paddingTop: '0px',
             boxSizing: 'border-box',
-            overflow: 'auto',
-            justifyContent: 'flex-start',
+            overflow: 'hidden',
+            justifyContent: 'center',
             alignItems: 'center',
             display: 'flex',
             flexDirection: 'column'
@@ -42,7 +42,8 @@ function PostItem() {
             flexDirection: "column",
             justifyContent: "center",
             alignItems: "center",
-            textAlign: "center"
+            textAlign: "center",
+            zIndex: 2,
         },
         input: {
             width: "calc(100% - 30px)",
@@ -92,6 +93,8 @@ function PostItem() {
         }
     };
 
+    const pizzaImageUrl = "https://i.pinimg.com/736x/12/1e/3c/121e3c7353b6c0c7ed5b8913918bc8bc.jpg";
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -130,6 +133,74 @@ function PostItem() {
 
     return (
         <div style={styles.pageContainer}>
+            <style>
+                {`
+                    @keyframes floatSlow {
+                        0% { transform: translateY(0px); }
+                        50% { transform: translateY(-20px); }
+                        100% { transform: translateY(0px); }
+                    }
+
+                    @keyframes floatAlt {
+                        0% { transform: translateY(0px); }
+                        50% { transform: translateY(15px); }
+                        100% { transform: translateY(0px); }
+                    }
+                `}
+            </style>
+
+            {/* Left Top Pizza */}
+            <div style={{
+                position: 'absolute',
+                left: '40px',
+                top: '15%',
+                width: '200px',
+                height: '200px',
+                animation: 'floatSlow 5s ease-in-out infinite',
+                zIndex: 1
+            }}>
+                <img src={pizzaImageUrl} alt="Pizza" style={{ width: '100%', height: '100%' }} />
+            </div>
+
+            {/* Left Bottom Pizza */}
+            <div style={{
+                position: 'absolute',
+                left: '40px',
+                bottom: '10%',
+                width: '200px',
+                height: '200px',
+                animation: 'floatAlt 6s ease-in-out infinite',
+                zIndex: 1
+            }}>
+                <img src={pizzaImageUrl} alt="Pizza" style={{ width: '100%', height: '100%' }} />
+            </div>
+
+            {/* Right Top Pizza */}
+            <div style={{
+                position: 'absolute',
+                right: '40px',
+                top: '15%',
+                width: '200px',
+                height: '200px',
+                animation: 'floatAlt 4.5s ease-in-out infinite',
+                zIndex: 1
+            }}>
+                <img src={pizzaImageUrl} alt="Pizza" style={{ width: '100%', height: '100%' }} />
+            </div>
+
+            {/* Right Bottom Pizza */}
+            <div style={{
+                position: 'absolute',
+                right: '40px',
+                bottom: '10%',
+                width: '200px',
+                height: '200px',
+                animation: 'floatSlow 6.5s ease-in-out infinite',
+                zIndex: 1
+            }}>
+                <img src={pizzaImageUrl} alt="Pizza" style={{ width: '100%', height: '100%' }} />
+            </div>
+
             <div style={styles.container}>
                 <h2 style={{
                     textAlign: 'center',
