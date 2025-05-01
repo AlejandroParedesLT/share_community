@@ -32,7 +32,9 @@ export default function FeedScreen() {
 
       const data = await response.json();
       console.log(data.results);
-      setPosts(data.results); // Update state with real posts
+      const reversedPosts = data.results.reverse();
+      setPosts(reversedPosts); // Update state with real posts
+      
     } catch (error) {
       Alert.alert('Error with the connection itself', error.message);
     }

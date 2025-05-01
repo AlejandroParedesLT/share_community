@@ -32,7 +32,7 @@ const CreateCard = ({ data }) => {
       {postImageUri && <Card.Cover source={{ uri: postImageUri }} style={styles.postImage} />}
       <Card.Content>
         <Title>{title}</Title>
-        <Paragraph>{content}</Paragraph>
+        <Paragraph>{title}: {content}</Paragraph>
       </Card.Content>
       {items.length > 0 && (
         <View style={[styles.carouselContainer, { width: "100%" }]}>

@@ -26,6 +26,7 @@ def item_image_upload_path(instance, filename):
     return hash_upload_path(instance, filename, "item_images")
 class Item(models.Model):
     precordsid = models.AutoField(primary_key=True)
+    original_id = models.CharField(max_length=255, unique=True, blank=True, null=True)
     type = models.ForeignKey(ItemType, on_delete=models.SET_NULL, null=True, blank=True, related_name="items")
     genre = models.ForeignKey(Genre, on_delete=models.SET_NULL, null=True, blank=True, related_name="items")
     title = models.CharField(max_length=255)

@@ -4,6 +4,8 @@ data/*
 *.log
 *__pycache__/
 
+share.env
+
 ref/
 temp
 .data
@@ -294,3 +296,8 @@ gradle-app.setting
 
 # .nfs files are created when an open file is removed but is still being accessed
 .nfs*
+
+artifacts/
+
+*.log
+*.csv
