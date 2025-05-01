@@ -1,15 +1,40 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, FlatList, Text, TouchableOpacity, Image, TextInput, StyleSheet } from 'react-native';
 import { router } from 'expo-router';
 import { FontAwesome } from '@expo/vector-icons';
+import { useAuth } from '../../providers/DjangoAuthProvider';
 
 export default function ChatsScreen() {
-  // Simulated chat list
-  const [chats, setChats] = useState([
-    { id: '1', name: 'Alice', lastMessage: 'Hey! How are you?', avatar: 'https://randomuser.me/api/portraits/women/1.jpg' },
-    { id: '2', name: 'Bob', lastMessage: 'Lets catch up soon!', avatar: 'https://randomuser.me/api/portraits/men/2.jpg' },
-    { id: '3', name: 'Charlie', lastMessage: 'See you tomorrow.', avatar: 'https://randomuser.me/api/portraits/men/3.jpg' },
-  ]);
+  // Init change here
+
+  const [chats, setChats] = useState([]);
+  const { accessToken } = useAuth();  // Get the access token
+  
+  useEffect(() => {
+    // Fetch past conversations from the backend
+    const fetchChats = async () => {
+      try {
+        const response = await fetch(`${process.env.EXPO_PUBLIC_DJANGO_API_URL}/api/chats/`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${accessToken}`, // Replace with actual token
+          },
+        });
+        
+        const data = await response.json();
+        //console.log('Log response from outside',JSON.stringify(data));
+        setChats(data);
+        console.log("Fetched chats:", JSON.stringify(chats)); // ✅ Log data correctly
+      } catch (error) {
+        console.error('Error fetching chats:', error);
+      }
+    };
+
+    fetchChats();
+  }, []);
+
+// End of change here
 
   return (
     <View style={styles.container}>
@@ -33,22 +58,33 @@ export default function ChatsScreen() {
       {/* Chat List */}
       <FlatList
         data={chats}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <TouchableOpacity 
-            style={styles.chatItem} 
-            onPress={() => router.push({
-              pathname: `/(chat)/${item.id}`,
-              params: { userName: item.name }
-            })}
-          >
-            <Image source={{ uri: item.avatar }} style={styles.avatar} />
-            <View style={styles.chatInfo}>
-              <Text style={styles.name}>{item.name}</Text>
-              <Text style={styles.lastMessage}>{item.lastMessage}</Text>
-            </View>
-          </TouchableOpacity>
-        )}
+        keyExtractor={(item) => item.id.toString()}
+        renderItem={({ item }) => {
+          const participantNames = Array.isArray(item.participants)
+            ? item.participants.map(p => p.username).join(', ')
+            : "Unknown";
+
+          console.log("Participant Names:", participantNames); // ✅ Debugging step
+
+          return (
+            <TouchableOpacity 
+              style={styles.chatItem} 
+              onPress={() => router.push({
+                pathname: `/(chat)/${item.id}`,
+                params: { userName: participantNames }
+              })}
+            >
+              <Image 
+                source={{ uri: item.avatar || 'https://cdn-icons-png.flaticon.com/512/166/166258.png' }} 
+                style={styles.avatar} 
+              />
+              <View style={styles.chatInfo}>
+                <Text style={styles.name}>{String(participantNames)}</Text>  {/* ✅ Ensures it's always a string */}
+                <Text style={styles.lastMessage}>{String(item.last_message?.content || "No messages yet")}</Text>  {/* ✅ Ensures content is a string */}
+              </View>
+            </TouchableOpacity>
+          );
+        }}
       />
 
       {/* New Chat Button */}

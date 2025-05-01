@@ -10,7 +10,9 @@ from api.views import (
     AudioView, 
     BookView, 
     MovieView, 
-    UserView, 
+    UserView,
+    # RecommenderView,  # Uncomment if you have a recommender view
+    RecommenderViews
 )
 from api.views import (ItemTypeViewSet, 
                        GenreViewSet, 
@@ -23,7 +25,8 @@ from api.views import (ItemTypeViewSet,
                        PostViewSet,
                        CountryViewSet,
                        ChatViewSet,
-                       MessageViewSet)
+                       MessageViewSet,
+                       ProfileViewSet)
 
 app_name = "api"
 
@@ -44,10 +47,16 @@ routerPostings.register(r'posts', PostViewSet)
 routingUsers = DefaultRouter()
 #routingUsers.register(r'user', UserView)
 routingUsers.register(r'countries', CountryViewSet)
+routingUsers.register(r'profile', ProfileViewSet)
 
 routingChat = DefaultRouter()
 routingChat.register(r'chats', ChatViewSet)
 routingChat.register(r'messages', MessageViewSet)
+
+# Recommender router (if needed)
+# recommenderRouter = DefaultRouter()
+# recommenderRouter.register(r'recommender', generate_user_embedding, basename='recommender')
+
 
 urlpatterns = [
     # Django methods
@@ -64,7 +73,9 @@ urlpatterns = [
     path('books/', BookView.as_view(), name='books'),
     path("movies/", MovieView.as_view(), name="movies"),
     path('audio/', AudioView.as_view(), name='audios'),
-    
+    path('generate_embeddings/', RecommenderViews.generate_user_embedding, name='register'),
+    path('recommend_users/', RecommenderViews.recommend_similar_users, name='register'),
+
     # Retrieve get_presigned_url
     #path('get_presigned_url/', views.get_presigned_url, name='get_presigned_url'),
 
@@ -73,6 +84,8 @@ urlpatterns = [
     
     # Chat routes
     path('', include(routingChat.urls)),
+    path("chats/<int:pk>/messages/", ChatViewSet.as_view({'get': 'messages'})),  # Add this line
+
 ]
 
 # path('posting/', PostView.as_view(), name='post_list'),

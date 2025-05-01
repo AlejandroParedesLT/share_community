@@ -26,16 +26,17 @@ User = get_user_model()
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ["username"]  # Only exposing the username
+        fields = ["id","username"]  # Only exposing the username
 
 class ProfileSerializer(serializers.ModelSerializer):
     username = serializers.CharField(source="user.username", read_only=True)  # Directly expose username
     userid = serializers.CharField(source="user.id", read_only=True)
+    email = serializers.CharField(source="user.email", read_only=True)
     presigned_image_url = serializers.SerializerMethodField()
     
     class Meta:
         model = Profile
-        fields = ["userid","username", "bio", "country", "presigned_image_url"]
+        fields = ["userid","username","email", "bio", "country", "presigned_image_url"]
     
     def get_presigned_image_url(self, obj):
         """Generate and return a pre-signed URL for the profile picture."""
@@ -120,7 +121,6 @@ class PostSerializer(serializers.ModelSerializer):
     user = ProfileSerializer(source="user.profile", read_only=True)
     presigned_image_url = serializers.SerializerMethodField()  # Add field for pre-signed URL
 
-
     class Meta:
         model = Post
         fields = '__all__'
@@ -164,18 +164,33 @@ class CountrySerializer(serializers.ModelSerializer):
         model = Country
         fields = '__all__'
 
+# class MessageSerializer(serializers.ModelSerializer):
+#     sender = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
+
+#     class Meta:
+#         model = Message
+#         fields = ['id', 'chat', 'sender', 'content', 'created_at', 'is_read']
+#         read_only_fields = ['id', 'created_at']
+
 class MessageSerializer(serializers.ModelSerializer):
-    sender = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
+    sender = serializers.SerializerMethodField()  # ✅ Fetch sender username
 
     class Meta:
         model = Message
         fields = ['id', 'chat', 'sender', 'content', 'created_at', 'is_read']
         read_only_fields = ['id', 'created_at']
 
+    def get_sender(self, obj):
+        return {
+            "id": obj.sender.id,
+            "username": obj.sender.username
+        }
 class ChatSerializer(serializers.ModelSerializer):
-    participants = serializers.PrimaryKeyRelatedField(
-        queryset=User.objects.all(), many=True
-    )
+    # participants = serializers.PrimaryKeyRelatedField(
+    #     queryset=User.objects.all(), many=True
+    # )
+    participants = UserSerializer(many=True, read_only=True)  # Returns user objects
+
     last_message = serializers.SerializerMethodField()
 
     class Meta:

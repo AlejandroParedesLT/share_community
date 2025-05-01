@@ -18,15 +18,34 @@ services:
     depends_on:
       - postgres_db
       - minio
+      - minio-client
       # - oracle_db
       # - mongo_db
     env_file:
       - .env
 
+  # postgres_db:
+  #   image: postgres:15
+  #   container_name: postgres_db
+  #   restart: always
+  #   environment:
+  #     POSTGRES_DB: mydatabase
+  #     POSTGRES_USER: ${GLOBAL_USER}
+  #     POSTGRES_PASSWORD: ${GLOBAL_PASSWORD}
+  #   ports:
+  #     - "5431:5432"
+  #   volumes:
+  #     - ./data/postgres:/var/lib/postgresql/data
+
   postgres_db:
-    image: postgres:15
+    image: ankane/pgvector:latest
     container_name: postgres_db
     restart: always
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "${GLOBAL_USER}", "-d", "mydatabase"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     environment:
       POSTGRES_DB: mydatabase
       POSTGRES_USER: ${GLOBAL_USER}
@@ -35,19 +54,7 @@ services:
       - "5431:5432"
     volumes:
       - ./data/postgres:/var/lib/postgresql/data
-
-  # mongo_db:
-  #   image: mongo:6
-  #   container_name: mongo_db
-  #   restart: always
-  #   environment:
-  #     MONGO_INITDB_ROOT_USERNAME: mongouser
-  #     MONGO_INITDB_ROOT_PASSWORD: mongopassword
-  #     MONGO_INITDB_DATABASE: mymongodb
-  #   ports:
-  #     - "27017:27017"
-  #   volumes:
-  #     - ./data/mongo:/data/db
+      - ./sqlScripts/init-vector.sql:/docker-entrypoint-initdb.d/init-vector.sql
 
   frontend_react:
     build:
@@ -100,27 +107,44 @@ services:
       timeout: 5s
       retries: 5
 
+  # minio-client:
+  #   image: minio/mc:latest
+  #   depends_on:
+  #     minio:
+  #       condition: service_healthy
+  #   entrypoint: >
+  #     /bin/sh -c "
+  #     sleep 5;
+  #     /usr/bin/mc config host add --quiet --api s3v4 myminio http://minio:9000 ${GLOBAL_USER} ${GLOBAL_PASSWORD};
+  #     /usr/bin/mc mb --quiet myminio/django-media || true;
+  #     /usr/bin/mc policy set public myminio/django-media;
+      
+  #     # Create service account for application
+  #     /usr/bin/mc config host add --quiet --api s3v4 myminio http://minio:9000 ${GLOBAL_USER} ${GLOBAL_PASSWORD} || echo 'Host already exists';
+  #     /usr/bin/mc admin user add myminio ${AWS_ACCESS_KEY_ID} ${AWS_SECRET_ACCESS_KEY} || echo 'User already exists or user creation failed';
+  #     /usr/bin/mc admin policy set myminio readwrite user=${AWS_ACCESS_KEY_ID}  || echo 'Policy attached or user policy failed';
+      
+  #     echo 'MinIO setup completed successfully';
+  #     "
+  #   env_file:
+  #     - .env
   minio-client:
     image: minio/mc:latest
     depends_on:
       minio:
         condition: service_healthy
-    entrypoint: >
-      /bin/sh -c "
-      sleep 5;
-      /usr/bin/mc config host add --quiet --api s3v4 myminio http://minio:9000 ${GLOBAL_USER} ${GLOBAL_PASSWORD};
-      /usr/bin/mc mb --quiet myminio/django-media || true;
-      /usr/bin/mc policy set public myminio/django-media;
-      
-      # Create service account for application
-      /usr/bin/mc config host add --quiet --api s3v4 myminio http://minio:9000 ${GLOBAL_USER} ${GLOBAL_PASSWORD} || echo 'Host already exists';
-      /usr/bin/mc admin user add myminio ${AWS_ACCESS_KEY_ID} ${AWS_SECRET_ACCESS_KEY} || echo 'User already exists or user creation failed';
-      /usr/bin/mc admin policy set myminio readwrite user=${AWS_ACCESS_KEY_ID}  || echo 'Policy attached or user policy failed';
-      
-      echo 'MinIO setup completed successfully';
-      "
+    volumes:
+      - ./setup-minio.sh:/setup-minio.sh  # Mount the setup script (not a directory)
+      - ./docker-entrypoint.sh:/docker-entrypoint.sh  # Mount your entrypoint script
+
+    entrypoint: ["/bin/sh", "/docker-entrypoint.sh"]  # This should execute the script
     env_file:
       - .env
+    healthcheck:
+      test: ["CMD-SHELL", "[ -f /tmp/minio-setup-done ]"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
 volumes:
   postgres_data:

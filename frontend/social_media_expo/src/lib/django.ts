@@ -59,3 +59,21 @@ export const refreshAccessToken = async () => {
     return null;
   }
 };
+
+
+export const getUserInfo = async (token: string) => {
+  try {
+    const response = await fetch(`${process.env.EXPO_PUBLIC_DJANGO_API_URL}/api/user/`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!response.ok) throw new Error("Failed to fetch user data");
+    return await response.json();
+  } catch (error) {
+    console.error("Error fetching user info:", error);
+    return null;
+  }
+};

@@ -5,6 +5,7 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import viewsets
 from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework import filters
 
 
 from django.shortcuts import get_object_or_404
@@ -34,6 +35,7 @@ class GenreViewSet(viewsets.ModelViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     permission_classes = [IsAuthenticated]
+    
 
 class ItemViewSet(viewsets.ModelViewSet):
     queryset = Item.objects.all()
@@ -42,6 +44,8 @@ class ItemViewSet(viewsets.ModelViewSet):
     parser_classes = (MultiPartParser, FormParser)  # Allow image uploads
     def perform_create(self, serializer):
         serializer.save()
+    filter_backends = [filters.SearchFilter]
+    search_fields = ["title"]
 
 # Implement this:
 

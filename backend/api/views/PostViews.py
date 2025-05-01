@@ -43,6 +43,7 @@ from socialmedia.storage import get_s3_client, get_custom_s3_client
 from django.conf import settings
 User = get_user_model()
 
+
 class CustomItemPagination(PageNumberPagination):
     page_size = 10  # Number of items per page
     page_size_query_param = 'page_size'  # Allow dynamic page sizes
@@ -79,27 +80,178 @@ class CustomItemPagination(PageNumberPagination):
     page_size_query_param = 'page_size'  # Allow dynamic page sizes
     max_page_size = 50  # Limit max items per page
 
+# class PostViewSet(viewsets.ModelViewSet):
+#     queryset = Post.objects.all()
+#     serializer_class = PostSerializer
+#     permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
+#     pagination_class = CustomItemPagination
+
+#     def perform_create(self, serializer):
+#         """Set the user field to the authenticated user before saving."""
+#         serializer.save(user=self.request.user)
+#     # def get_queryset(self):
+#     #     limit = self.request.query_params.get('limit', 10)  # Default to 10 if not provided
+#     #     return Post.objects.all().order_by('-created_at')[:int(limit)]
+
+from django.db import connection
+import logging
+from recommenders.services.embedding_service import ModelService
+from django.db import models
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
     permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
     pagination_class = CustomItemPagination
 
-    def perform_create(self, serializer):
-        """Set the user field to the authenticated user before saving."""
-        serializer.save(user=self.request.user)
+    # def get_queryset(self):
+    #     """
+    #     This method is responsible for filtering posts based on the user ID.
+    #     If a 'user_id' query parameter is provided, it filters the posts for that specific user.
+    #     """
+    #     user_id = self.request.query_params.get('id')  # Retrieve 'user_id' from the query params
+        
+    #     if user_id:
+    #         return Post.objects.filter(user__id=user_id)  # Filter posts by user ID
+        
+        
+    #     return Post.objects.all() 
 
     def get_queryset(self):
         """
-        This method is responsible for filtering posts based on the user ID.
-        If a 'user_id' query parameter is provided, it filters the posts for that specific user.
+        Returns posts filtered according to these rules:
+        - If total posts < 20, return all posts
+        - Otherwise, retrieve posts from users ordered by embedding similarity,
+        then by date descending, limited to 20 posts total
         """
-        user_id = self.request.query_params.get('id')  # Retrieve 'user_id' from the query params
+        user_id = self.request.query_params.get('id')
         
+        # If user_id is provided, return only that user's posts
         if user_id:
-            return Post.objects.filter(user__id=user_id)  # Filter posts by user ID
+            return Post.objects.filter(user__id=user_id)
         
-        return Post.objects.all()  # Return all posts if no user_id is provided
+        # Check if we have less than 20 posts total
+        total_posts = Post.objects.count()
+        if total_posts < 20:
+            return Post.objects.all().order_by('-created_at')
+        
+        # Get current user's embedding to use for similarity search
+        current_user_id = self.request.user.id
+        
+        try:
+            # Get model service to use embeddings
+            model_service = ModelService.get_instance()
+            
+            # Get the current user's embedding for similarity comparison
+            try:
+                current_user_embedding = model_service.get_user_embedding(current_user_id)
+            except ValueError:
+                # If user has no embedding, fall back to regular ordering
+                return Post.objects.all().order_by('-created_at')[:20]
+            
+            # Get similar users based on embedding vector similarity
+            with connection.cursor() as cursor:
+                # Convert the NumPy array to a PostgreSQL vector string
+                vector_str = "[" + ",".join(str(x) for x in current_user_embedding.tolist()) + "]"
+                
+                # Query to find similar users based on embedding cosine similarity
+                # Limit to more than 20 users to ensure we have enough posts
+                cursor.execute("""
+                    SELECT user_id, 
+                        embedding <=> %s::vector AS distance
+                    FROM user_embeddings
+                    WHERE user_id != %s
+                    ORDER BY distance ASC
+                    LIMIT 50
+                """, [vector_str, current_user_id])
+                
+                similar_users = [row[0] for row in cursor.fetchall()]
+            
+            if not similar_users:
+                # Fall back to regular ordering if no similar users found
+                return Post.objects.all().order_by('-created_at')
+            
+            # First get posts from similar users, ordered by user similarity then by date
+            similar_user_posts = Post.objects.filter(
+                user_id__in=similar_users
+            ).order_by(
+                # This uses the Case/When to order by the similarity rank
+                *[models.Case(
+                    *[models.When(user_id=user_id, then=models.Value(i)) 
+                    for i, user_id in enumerate(similar_users)],
+                    default=models.Value(len(similar_users))
+                ),
+                '-created_at']
+            )[:20]
+            
+            return similar_user_posts
+            
+        except Exception as e:
+            logging.error(f"Error in similarity-based post retrieval: {e}")
+            # Fall back to default ordering in case of errors
+            return Post.objects.all().order_by('-created_at')[:20]
+
+    def perform_create(self, serializer):
+        """Set the user field to the authenticated user before saving."""
+        post = serializer.save(user=self.request.user)
+        self.update_user_embedding(self.request.user)
+        return post
+    
+    def perform_update(self, serializer):
+        """Update the post and refresh user embedding."""
+        post = serializer.save()
+        # Only update embedding for significant content changes
+        if 'content' in serializer.validated_data or 'title' in serializer.validated_data:
+            self.update_user_embedding(post.user)
+        return post
+    
+    def perform_destroy(self, instance):
+        """Delete the post and refresh user embedding."""
+        user = instance.user
+        instance.delete()
+        self.update_user_embedding(user)
+    
+    def update_user_embedding(self, user):
+        """
+        Updates or creates the user's embedding vector based on their latest activity
+        """
+        try:
+            # Get the model service instance
+            model_service = ModelService.get_instance()
+            
+            # Generate a new embedding for the user
+            user_embedding = model_service.get_user_embedding(user.id)
+            
+            # Store or update the embedding in the database
+            with connection.cursor() as cursor:
+                # Convert the NumPy array to a PostgreSQL vector
+                vector_str = "[" + ",".join(str(x) for x in user_embedding.tolist()) + "]"
+                
+                # Check if user already has an embedding
+                cursor.execute(
+                    "SELECT user_id FROM user_embeddings WHERE user_id = %s",
+                    [user.id]
+                )
+                result = cursor.fetchone()
+                
+                if result:
+                    # Update existing embedding
+                    cursor.execute(
+                        "UPDATE user_embeddings SET embedding = %s::vector, updated_at = NOW() WHERE user_id = %s",
+                        [vector_str, user.id]
+                    )
+                else:
+                    # Insert new embedding
+                    cursor.execute(
+                        "INSERT INTO user_embeddings (user_id, embedding, created_at, updated_at) VALUES (%s, %s::vector, NOW(), NOW())",
+                        [user.id, vector_str]
+                    )
+            
+            logging.info(f"Updated embedding for user {user.id}")
+            return True
+            
+        except Exception as e:
+            logging.error(f"Error updating user embedding: {e}")
+            return False
 
 # @api_view(["GET"])
 # @permission_classes([IsAuthenticated])

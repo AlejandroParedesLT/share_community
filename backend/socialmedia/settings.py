@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     "channels",
     "corsheaders",
     "storages",
+    "recommenders"
 ]
 
 #
