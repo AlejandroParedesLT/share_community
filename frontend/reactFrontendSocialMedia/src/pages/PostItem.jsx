@@ -175,7 +175,7 @@ function PostItem() {
                 <img src={pizzaImageUrl} alt="Pizza" style={{ width: '100%', height: '100%' }} />
             </div>
 
-            {/* Right Top Pizza */}
+            
             <div style={{
                 position: 'absolute',
                 right: '40px',
