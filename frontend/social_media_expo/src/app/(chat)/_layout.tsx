@@ -12,6 +12,7 @@ export default function ChatLayout() {
       }}>
         <Stack.Screen name="index" />
         <Stack.Screen name="[id]" />
+        <Stack.Screen name="joinChat" />
       </Stack>
     </View>
   );

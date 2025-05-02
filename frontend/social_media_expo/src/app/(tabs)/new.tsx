@@ -3,13 +3,13 @@
 // import { useEffect, useState } from 'react';
 // import * as ImagePicker from 'expo-image-picker';
 // import Button from '../../components/Button';
-// import { uploadImage } from '../../lib/cloudinary';
 // import { useAuth } from '../../providers/DjangoAuthProvider';
 // import { router } from 'expo-router';
 
 // const screenWidth = Dimensions.get('window').width;
 
 // export default function CreatePost() {
+//   const [title, setTitle] = useState('');
 //   const [caption, setCaption] = useState('');
 //   const [media, setMedia] = useState<string | null>(null);
 //   const [selectedItems, setSelectedItems] = useState<any[]>([]);
@@ -17,19 +17,20 @@
 //   const [searchQuery, setSearchQuery] = useState('');
 //   const [items, setItems] = useState<any[]>([]);
 //   const { accessToken } = useAuth();
-//   let searchTimeout: NodeJS.Timeout | null = null; 
 
 //   useEffect(() => {
-//     if (itemType || searchQuery) {
-//       if (searchTimeout) clearTimeout(searchTimeout);
-//       searchTimeout = setTimeout(() => {
-//         fetchItems();
-//       }, 500); 
+//     if (itemType !== null) {
+//       fetchItems();
 //     }
-//     return () => {
-//       if (searchTimeout) clearTimeout(searchTimeout);
-//     };
-//   }, [searchQuery, itemType]);
+//   }, [itemType]); // Fetch items immediately when itemType changes
+
+//   useEffect(() => {
+//     const searchTimeout = setTimeout(() => {
+//       if (searchQuery) fetchItems();
+//     }, 500);
+    
+//     return () => clearTimeout(searchTimeout);
+//   }, [searchQuery]);
 
 //   const fetchItems = async () => {
 //     try {
@@ -46,9 +47,7 @@
 //       }
 
 //       const data = await response.json();
-//       console.log("API Response:", data);
-
-//       setItems(Array.isArray(data) ? data : data.results || []);
+//       setItems(Array.isArray(data) ? data.slice(0, 5) : (data.results || []).slice(0, 5)); // Limit to 5 visible items
 //     } catch (error) {
 //       Alert.alert('Error', error.message);
 //     }
@@ -67,39 +66,64 @@
 //   };
 
 //   const createPost = async () => {
-//     if (!media || selectedItems.length === 0) {
-//       Alert.alert('Error', 'You must select at least one item and upload an image.');
+//     if (!media || selectedItems.length === 0 || !title) {
+//       Alert.alert('Error', 'You must select at least one item, set a title and upload an image.');
 //       return;
 //     }
 
-//     const response = await uploadImage(media);
+//     const formData = new FormData();
+//     formData.append("title", title);
+//     formData.append("content", caption);
+//     //formData.append("items", JSON.stringify(selectedItems.map((item) => item.precordsid)) as any); // Ensure correct format
+  
+//       // Convert items list to individual form fields
+//   selectedItems.forEach((item) => {
+//     formData.append("items", item.precordsid.toString()); // ✅ Send each item separately
+//   });
 
-//     const postData = {
-//       title,
-//       content: caption,
-//       image: response?.public_id,
-//       items: selectedItems.map((item) => item.precordsid),
-//     };
-//     console.log("Post Data:", postData);
+//   // Extract file extension
+//   const fileType = media.split('.').pop();
+  
+//   // Convert the image to a format React Native can handle
+//   formData.append("image", {
+//     uri: media,
+//     name: `upload.${fileType}`,
+//     type: `image/${fileType === "jpg" ? "jpeg" : fileType}`,
+//   } as unknown as Blob); // ✅ Ensure correct type
+
+
+//   console.log("Post Data:", formData);
+//   try {
 //     const res = await fetch(`${process.env.EXPO_PUBLIC_DJANGO_API_URL}/api/posts/`, {
 //       method: 'POST',
 //       headers: {
-//         'Content-Type': 'application/json',
-//         Authorization: `Bearer ${accessToken}`,
+//         Authorization: `Bearer ${accessToken}`, // ✅ No need to manually set Content-Type
 //       },
-//       body: JSON.stringify(postData),
+//       body: formData, // ✅ Send FormData directly
 //     });
-
+//     console.log("Response:", res);
 //     if (!res.ok) {
-//       Alert.alert('Error', 'Failed to create post.');
-//       return;
+//       throw new Error(`Failed to create post: ${res.status}`);
 //     }
 
 //     router.push('/(tabs)');
-//   };
+//   } catch (error) {
+//     Alert.alert('Error', error.message);
+//   }
+// };
 
 //   return (
 //     <View className="p-3 flex-1">
+//       <Text style={{ textAlign: 'center', fontSize: 20, fontWeight: 'bold' }}>Make your post!</Text>
+
+//       {/* Title of the post */}
+//       <TextInput
+//         placeholder="Set a title for your post..."
+//         value={title}
+//         onChangeText={setTitle}
+//         className="border p-2 my-3 rounded-lg bg-gray-100"
+//       />
+
 //       {/* Image Picker */}
 //       {media ? (
 //         <Image source={{ uri: media }} className="w-52 h-52 rounded-lg" />
@@ -118,19 +142,20 @@
 //       </Picker>
 
 //       {/* Search Bar */}
-//       {itemType && (<TextInput
-//         placeholder="Search item..."
-//         value={searchQuery}
-//         onChangeText={setSearchQuery}
-//         className="border p-2 my-2"
-//       />)}
+//       {itemType !== null && (
+//         <TextInput
+//           placeholder="Search item..."
+//           value={searchQuery}
+//           onChangeText={setSearchQuery}
+//           className="border p-2 my-2 rounded-lg"
+//         />
+//       )}
 
-//       {/* Item List */}
-//       <FlatList
-//         data={items}
-//         keyExtractor={(item) => item.precordsid.toString()}
-//         renderItem={({ item }) => (
+//       {/* Item List (Shows max 5, scrollable) */}
+//       <ScrollView style={{ maxHeight: 200 }}>
+//         {items.map((item) => (
 //           <Pressable
+//             key={item.precordsid}
 //             onPress={() => {
 //               setSelectedItems((prev) =>
 //                 prev.some((i) => i.precordsid === item.precordsid)
@@ -144,33 +169,47 @@
 //           >
 //             <Text>{item.title}</Text>
 //           </Pressable>
-//         )}
-//       />
-
-//       {/* Selected Items (Grid View) */}
-//       <Text className="mt-3 font-semibold">Selected Items:</Text>
-//       <ScrollView horizontal className="flex-row mt-2">
-//         {selectedItems.map((item) => (
-//           <View
-//             key={item.precordsid}
-//             style={{
-//               width: screenWidth / 3 - 10, 
-//               marginHorizontal: 5,
-//               backgroundColor: '#f0f0f0',
-//               padding: 5,
-//               borderRadius: 10,
-//               alignItems: 'center',
-//             }}
-//           >
-//             {item.presigned_image_url ? (
-//               <Image source={{ uri: item.presigned_image_url }} style={{ width: '100%', height: 80, borderRadius: 5 }} />
-//             ) : (
-//               <View style={{ width: '100%', height: 80, backgroundColor: '#ccc', borderRadius: 5 }} />
-//             )}
-//             <Text numberOfLines={1} className="text-center mt-1">{item.title}</Text>
-//           </View>
 //         ))}
 //       </ScrollView>
+
+//       {/* Selected Items (Grid View) */}
+//       {selectedItems.length > 0 && (
+//         <>
+//           <Text className="mt-3 font-semibold">Selected Items:</Text>
+//           <ScrollView horizontal className="flex-row mt-2">
+//             {selectedItems.map((item) => (
+//               <View
+//                 key={item.precordsid}
+//                 style={{
+//                   width: screenWidth / 3 - 10, 
+//                   marginHorizontal: 5,
+//                   backgroundColor: '#f0f0f0',
+//                   padding: 5,
+//                   borderRadius: 10,
+//                   alignItems: 'center',
+//                 }}
+//               >
+//                 {item.presigned_image_url ? (
+//                   <Image source={{ uri: item.presigned_image_url }} style={{ width: '100%', height: 80, borderRadius: 5 }} />
+//                 ) : (
+//                   <View style={{ width: '100%', height: 80, backgroundColor: '#ccc', borderRadius: 5 }} />
+//                 )}
+//                 <Text numberOfLines={1} className="text-center mt-1">{item.title}</Text>
+//               </View>
+//             ))}
+//           </ScrollView>
+//         </>
+//       )}
+
+//       {/* Caption Input (Only visible after selecting at least one item) */}
+//       {selectedItems.length > 0 && (
+//         <TextInput
+//           placeholder="Write your caption..."
+//           value={caption}
+//           onChangeText={setCaption}
+//           className="border p-2 my-3 rounded-lg bg-gray-100"
+//         />
+//       )}
 
 //       {/* Submit Button */}
 //       <Button title="Post" onPress={createPost} />
@@ -179,7 +218,7 @@
 // }
 
 
-import { Text, View, Image, TextInput, Pressable, FlatList, Alert, ScrollView, Dimensions } from 'react-native';
+import { Text, View, Image, TextInput, Pressable, FlatList, Alert, ScrollView, Dimensions, ActivityIndicator } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { useEffect, useState } from 'react';
 import * as ImagePicker from 'expo-image-picker';
@@ -197,23 +236,30 @@ export default function CreatePost() {
   const [itemType, setItemType] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [items, setItems] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
   const { accessToken } = useAuth();
 
+  // Fetch items whenever itemType changes (dropdown selection)
   useEffect(() => {
     if (itemType !== null) {
       fetchItems();
+    } else {
+      setItems([]); // Clear items when no type is selected
     }
-  }, [itemType]); // Fetch items immediately when itemType changes
+  }, [itemType]);
 
+  // Fetch items when search query changes with a delay
   useEffect(() => {
     const searchTimeout = setTimeout(() => {
-      if (searchQuery) fetchItems();
+      if (searchQuery && itemType !== null) fetchItems();
     }, 500);
     
     return () => clearTimeout(searchTimeout);
   }, [searchQuery]);
 
   const fetchItems = async () => {
+    if (itemType === null) return;
+    
     try {
       const response = await fetch(
         `${process.env.EXPO_PUBLIC_DJANGO_API_URL}/api/items/?type=${itemType}&search=${searchQuery}`,
@@ -235,6 +281,8 @@ export default function CreatePost() {
   };
 
   const pickMedia = async () => {
+    if (isLoading) return; // Prevent action while loading
+    
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
@@ -247,51 +295,61 @@ export default function CreatePost() {
   };
 
   const createPost = async () => {
+    if (isLoading) return; // Prevent multiple submissions
+    
     if (!media || selectedItems.length === 0 || !title) {
       Alert.alert('Error', 'You must select at least one item, set a title and upload an image.');
       return;
     }
 
-    const formData = new FormData();
-    formData.append("title", title);
-    formData.append("content", caption);
-    //formData.append("items", JSON.stringify(selectedItems.map((item) => item.precordsid)) as any); // Ensure correct format
-  
+    setIsLoading(true); // Start loading state
+    
+    try {
+      const formData = new FormData();
+      formData.append("title", title);
+      formData.append("content", caption);
+    
       // Convert items list to individual form fields
-  selectedItems.forEach((item) => {
-    formData.append("items", item.precordsid.toString()); // ✅ Send each item separately
-  });
+      selectedItems.forEach((item) => {
+        formData.append("items", item.precordsid.toString());
+      });
 
-  // Extract file extension
-  const fileType = media.split('.').pop();
-  
-  // Convert the image to a format React Native can handle
-  formData.append("image", {
-    uri: media,
-    name: `upload.${fileType}`,
-    type: `image/${fileType === "jpg" ? "jpeg" : fileType}`,
-  } as unknown as Blob); // ✅ Ensure correct type
+      // Extract file extension
+      const fileType = media.split('.').pop();
+      
+      // Convert the image to a format React Native can handle
+      formData.append("image", {
+        uri: media,
+        name: `upload.${fileType}`,
+        type: `image/${fileType === "jpg" ? "jpeg" : fileType}`,
+      } as unknown as Blob);
 
+      const res = await fetch(`${process.env.EXPO_PUBLIC_DJANGO_API_URL}/api/posts/`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: formData,
+      });
+      
+      if (!res.ok) {
+        throw new Error(`Failed to create post: ${res.status}`);
+      }
 
-  console.log("Post Data:", formData);
-  try {
-    const res = await fetch(`${process.env.EXPO_PUBLIC_DJANGO_API_URL}/api/posts/`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${accessToken}`, // ✅ No need to manually set Content-Type
-      },
-      body: formData, // ✅ Send FormData directly
-    });
-    console.log("Response:", res);
-    if (!res.ok) {
-      throw new Error(`Failed to create post: ${res.status}`);
+      router.push('/(tabs)');
+    } catch (error) {
+      Alert.alert('Error', error.message);
+    } finally {
+      setIsLoading(false); // End loading state regardless of outcome
     }
+  };
 
-    router.push('/(tabs)');
-  } catch (error) {
-    Alert.alert('Error', error.message);
-  }
-};
+  // Handle picker change with proper type annotation
+  const handlePickerChange = (value: number | null) => {
+    setItemType(value);
+    // Reset search when changing item type
+    setSearchQuery('');
+  };
 
   return (
     <View className="p-3 flex-1">
@@ -303,19 +361,28 @@ export default function CreatePost() {
         value={title}
         onChangeText={setTitle}
         className="border p-2 my-3 rounded-lg bg-gray-100"
+        editable={!isLoading} // Disable when loading
       />
 
       {/* Image Picker */}
       {media ? (
         <Image source={{ uri: media }} className="w-52 h-52 rounded-lg" />
       ) : (
-        <Pressable onPress={pickMedia} className="p-5 bg-gray-300 rounded-lg">
-          <Text>Pick an Image</Text>
+        <Pressable 
+          onPress={pickMedia} 
+          className={`p-5 ${isLoading ? 'bg-gray-200' : 'bg-gray-300'} rounded-lg`}
+          disabled={isLoading}
+        >
+          <Text>{isLoading ? "Please wait..." : "Pick an Image"}</Text>
         </Pressable>
       )}
 
       {/* Item Type Selection */}
-      <Picker selectedValue={itemType} onValueChange={(value) => setItemType(value)}>
+      <Picker 
+        selectedValue={itemType} 
+        onValueChange={handlePickerChange}
+        enabled={!isLoading} // Disable when loading
+      >
         <Picker.Item label="Select Type" value={null} />
         <Picker.Item label="Music" value={1} />
         <Picker.Item label="Books" value={2} />
@@ -329,6 +396,7 @@ export default function CreatePost() {
           value={searchQuery}
           onChangeText={setSearchQuery}
           className="border p-2 my-2 rounded-lg"
+          editable={!isLoading} // Disable when loading
         />
       )}
 
@@ -338,6 +406,8 @@ export default function CreatePost() {
           <Pressable
             key={item.precordsid}
             onPress={() => {
+              if (isLoading) return; // Prevent action while loading
+              
               setSelectedItems((prev) =>
                 prev.some((i) => i.precordsid === item.precordsid)
                   ? prev.filter((i) => i.precordsid !== item.precordsid)
@@ -346,7 +416,7 @@ export default function CreatePost() {
             }}
             className={`p-2 my-1 mx-1 rounded-lg ${
               selectedItems.some((i) => i.precordsid === item.precordsid) ? 'bg-blue-200' : 'bg-white'
-            }`}
+            } ${isLoading ? 'opacity-50' : 'opacity-100'}`}
           >
             <Text>{item.title}</Text>
           </Pressable>
@@ -389,11 +459,23 @@ export default function CreatePost() {
           value={caption}
           onChangeText={setCaption}
           className="border p-2 my-3 rounded-lg bg-gray-100"
+          editable={!isLoading} // Disable when loading
         />
       )}
 
-      {/* Submit Button */}
-      <Button title="Post" onPress={createPost} />
+      {/* Submit Button with Loading Indicator */}
+      <View className="mt-4">
+        <Button 
+          title={isLoading ? "Posting..." : "Post"} 
+          onPress={createPost} 
+          disabled={isLoading}
+        />
+        {isLoading && (
+          <View className="absolute top-0 left-0 right-0 bottom-0 justify-center items-center">
+            <ActivityIndicator size="small" color="#0000ff" />
+          </View>
+        )}
+      </View>
     </View>
   );
 }
