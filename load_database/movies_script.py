@@ -10,15 +10,15 @@ import chardet
 
 
 # Configuration
-CSV_FILE_PATH = "/home/nd191/share_community/sqlScripts/pyscripts/shortened_movie_records.csv"
-# API_BASE_URL = "http://3fad-152-3-43-40.ngrok-free.app/api"
+CSV_FILE_PATH = (
+    "/Users/nakiyahdhariwala/share_community/load_database/cleaned_movie_records.csv"
+)
 API_BASE_URL = "http://localhost:8001/api"
-
 LOGIN_ENDPOINT = f"{API_BASE_URL}/login/"
 MOVIES_ENDPOINT = f"{API_BASE_URL}/items/"
-IMAGE_PATH = "/home/nd191/share_community/img_src/"
-DEFAULT_IMAGE_PATH = "./movie.png"
-IMAGE_MAP_FILE = "./json/movie_image_map.json"  # File with the image mapping
+IMAGE_PATH = "./img_src/"
+DEFAULT_IMAGE_PATH = "/Users/nakiyahdhariwala/share_community/movie.png"
+IMAGE_MAP_FILE = "/Users/nakiyahdhariwala/share_community/load_database/shortened_movie_image_map.json"  # File with the image mapping
 
 
 # # Authentication credentials
@@ -26,8 +26,11 @@ USERNAME = "admin"  # Replace with your username
 PASSWORD = "adminpassword"  # Replace with your password
 
 # Define a mapping of genre names to IDs (adjust with your actual IDs)
-with open("/home/nd191/share_community/load_database/genres.json", "r") as f:
+with open(
+    "/Users/nakiyahdhariwala/share_community/load_database/genres.json", "r"
+) as f:
     genre_map = json.load(f)
+    genres = genre_map.get("genres", [])
 
 
 # Logging setup
@@ -55,6 +58,43 @@ def get_auth_token():
             return None
     except Exception as e:
         logging.error(f"Error during authentication: {str(e)}")
+        return None
+
+
+def clean_and_match_genre(genre_str, genres, title=None):
+    """
+    Parse a genre string from CSV and match it to an ID from the loaded genre list.
+    Returns the matched genre ID as a string, or None if no match is found.
+    """
+    try:
+        genre_str = genre_str.strip()
+
+        # Remove outer quotes if accidentally double-encoded
+        if genre_str.startswith('"') and genre_str.endswith('"'):
+            genre_str = genre_str[1:-1]
+
+        genre_list = ast.literal_eval(genre_str)
+
+        if not genre_list:
+            logging.warning(f"No genre listed for '{title}' — skipping.")
+            return None
+
+        # Extract first genre as-is (preserve capitalization and symbols like '[]')
+        first_genre = genre_list[0].strip()
+
+        matched_genre = next(
+            (str(genre["id"]) for genre in genres if genre["name"] == first_genre),
+            None,
+        )
+
+        if not matched_genre:
+            logging.warning(
+                f"Genre '{first_genre}' not found for '{title}' — skipping."
+            )
+        return matched_genre
+
+    except Exception as e:
+        logging.warning(f"Genre parse error for '{title}': {e}")
         return None
 
 
@@ -89,29 +129,18 @@ def load_movies_from_csv(auth_token, image_map):
         # Open the file with the detected encoding
         with open(CSV_FILE_PATH, "r", encoding=encoding) as file:
             csv_reader = csv.DictReader(file)
-            i = 0
+
             for row in csv_reader:
-                i += 1
-                if i == 1000:
-                    break
                 # Extract data from the row
                 title = row.get("name", "")
                 description = row.get("description", "")
 
                 # Parse the genre list string and get the first genre
                 genre_str = row.get("genre", "[]")
-                try:
-                    # Using ast.literal_eval to safely evaluate the string as a Python literal
-                    genre_list = ast.literal_eval(genre_str)
-                    first_genre = genre_list[0] if genre_list else ""
-                    # Get genre ID from the mapping
-                    genre_id = genre_map.get(first_genre, "1")
-                except (SyntaxError, ValueError):
-                    # Fallback if parsing fails
-                    print(
-                        f"Warning: Could not parse genre for {title}. Using 1 as genre."
-                    )
-                    genre_id = "1"
+
+                genre_id = clean_and_match_genre(genre_str, genres, title)
+                if not genre_id:
+                    continue
 
                 release_date = row.get("date", "")
                 try:
@@ -170,8 +199,10 @@ def load_movies_from_csv(auth_token, image_map):
                     )
                     if response.status_code == 201:
                         logging.info(f"Successfully added movie: {title}")
+                        print(f"Successfully added movie: {title}")
                     else:
                         logging.error(f"Failed to add movie {title}: {response.text}")
+                        print(f"Failed to add movie {title}: {response.text}")
                 except Exception as e:
                     logging.error(f"Error adding movie {title}: {e}")
     except Exception as e:

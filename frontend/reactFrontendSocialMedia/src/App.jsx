@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, useNavigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useNavigate, Navigate } from "react-router-dom";
 import { useState } from "react";
 import axios from "axios";
 import Dashboard from "./pages/Dashboard";
@@ -11,6 +11,7 @@ import UserProfile from "./pages/Profile";
 import ItemDetails from "./pages/ViewItem";
 import SignUp from "./pages/Signup";
 import Preferences from "./pages/Preferences";
+import MyProfile from "./pages/MyProfile";
 
 function App() {
   return (
@@ -26,6 +27,8 @@ function App() {
               <Route path="/create-post" element={<PostPost />} />
               <Route path="/profile/:id" element={<UserProfile />} />
               <Route path="/view-item/:precordsid" element={<ItemDetails />} />
+              <Route path="/" element={<Navigate to="/home" replace />} />
+            <Route path="/profile/me" element={<MyProfile />} />
           </Routes>
       </Router>
   );

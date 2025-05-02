@@ -1,0 +1,4 @@
+/usr/bin/mc config host add --api s3v4 myminio http://minio:9000 myuser mypassword;
+/usr/bin/mc admin user add myminio minio minio123 || echo 'User already exists or user creation failed';
+/usr/bin/mc admin policy attach myminio readwrite --user=minio;
+

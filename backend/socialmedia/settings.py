@@ -291,5 +291,5 @@ MEDIA_URL = f"{AWS_S3_ENDPOINT_URL}/{MINIO_BUCKET_NAME}/"
 
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:8001/",  # Frontend React app URL
+    "http://localhost:8001",  # Frontend React app URL
 ]

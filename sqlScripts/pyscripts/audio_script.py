@@ -8,14 +8,17 @@ import re
 import tempfile
 import urllib.parse
 import ast  # For safely evaluating the string representation of Python lists
+import time 
 
 # Configuration
 # CSV_FILE_PATH = "./sqlScripts/artifacts/spotify_dataset_with_description.csv"
-CSV_FILE_PATH = "./artifacts/spotify_dataset_with_description.csv"
+CSV_FILE_PATH = "sqlScripts/pyscripts/spotify_dataset_condensed.csv"
 API_BASE_URL = "http://localhost:8001/api"
+# API_BASE_URL = "http://3fad-152-3-43-40.ngrok-free.app/api"
+
 LOGIN_ENDPOINT = f"{API_BASE_URL}/login/"
 ITEMS_ENDPOINT = f"{API_BASE_URL}/items/"
-DEFAULT_IMAGE_PATH = "./popeye.jpg"
+DEFAULT_IMAGE_PATH = "/home/nd191/share_community/sqlScripts/popeye.jpg"
 
 USERNAME = "admin"
 PASSWORD = "adminpassword"
@@ -45,7 +48,7 @@ PASSWORD = "adminpassword"
 #     return 1
 
 # Define a mapping of genre names to IDs (adjust with your actual IDs)
-with open('./json/genres.json', 'r') as f:
+with open("/home/nd191/share_community/load_database/genres.json", 'r') as f:
     genre_map = json.load(f)
     genres = genre_map.get("genres", [])
 
@@ -121,7 +124,7 @@ def load_music_from_csv(auth_token):
             i = 0
             for row in csv_reader:
                 i += 1
-                if i > 150:  # Limit to first 10 rows for testing
+                if i > 1100:  # Limit to first 10 rows for testing
                     break
                 title = row.get("title", "").strip()
                 track_id = row.get("track_id", "").strip()
@@ -157,7 +160,7 @@ def load_music_from_csv(auth_token):
                         publish_date = parsed_date.strftime("%Y-%m-%dT00:00:00")
                     except ValueError:
                         print(f"Warning: Could not parse release date '{release_date_str}' for title '{title}'. Using empty date.")
-                        publish_date = ""
+                        publish_date = "2020-01-01T00:00:00"
 
                 description = row.get("description", "").strip()
                 cover_img_url = row.get("cover_img_url", "").strip()
@@ -196,6 +199,8 @@ def load_music_from_csv(auth_token):
                     else:
                         print(f"Failed to add audio: {title}. Status code: {response.status_code}")
                         print(f"Response: {response.text}")
+                    time.sleep(0.5)
+                        
                 except Exception as e:
                     print(f"Error adding audio {title}: {str(e)}")
                 finally:
@@ -206,6 +211,7 @@ def load_music_from_csv(auth_token):
                             print(f"Deleted temporary image: {image_path}")
                         except Exception as e:
                             print(f"Failed to delete temporary image {image_path}: {str(e)}")
+                            
                 
     except Exception as e:
         print(f"Error processing CSV file: {str(e)}")

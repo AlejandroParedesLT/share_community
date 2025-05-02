@@ -5,9 +5,9 @@ from urllib.parse import urlparse
 import json
 
 # Configuration
-CSV_FILE_PATH = "./artifacts/books_original.csv"  # Update this to your CSV file path
+CSV_FILE_PATH = "/home/nd191/share_community/load_database/final_books_for_db (1).csv"  # Update this to your CSV file path
 IMAGES_DIR = "./artifacts/book_images"  # Directory to store downloaded images
-DEFAULT_IMAGE_PATH = "./popeye.jpg"  # Path to a default image if none is provided
+DEFAULT_IMAGE_PATH = "/home/nd191/share_community/sqlScripts/popeye.jpg"  # Path to a default image if none is provided
 IMAGE_MAP_FILE = "./image_map.json"  # File to store the mapping
 
 

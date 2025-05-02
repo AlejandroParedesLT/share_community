@@ -19,8 +19,18 @@ DB_CONFIG = {
     'port': 5431
 }
 
-CSV_PATH = './artifacts/user_embeddings.csv'  # Replace with the path to your CSV file
+CSV_PATH = '/home/nd191/share_community/sqlScripts/user_embeddings.csv'  # Replace with the path to your CSV file
 PROFILE_API_URL = 'http://localhost:8001/api/user/'
+
+# def create_multiple_users(n=10):
+#     created_ids = []
+#     for _ in range(n):
+#         user_id = create_user_via_profile()
+#         if user_id:
+#             created_ids.append(user_id)
+#     print(f"✅ Created {len(created_ids)} users.")
+#     return created_ids
+
 
 def random_name(length=8):
     return ''.join(random.choices(string.ascii_lowercase, k=length))
@@ -59,9 +69,10 @@ def insert_user_embeddings():
             cursor.execute("SELECT 1 FROM auth_user WHERE id = %s", (user_id,))
             if not cursor.fetchone():
                 # Create new user and update user_id
-                new_user_id = create_user_via_profile()
-                if new_user_id is None:
-                    continue  # skip this embedding
+                for i in range(934):
+                    new_user_id = create_user_via_profile()
+                    if new_user_id is None:
+                        continue  # skip this embedding
                 # cursor.execute("SELECT max(id) FROM auth_user", (user_id,))
                 # cursor.fetchone()
                 # user_id = new_user_id
@@ -80,4 +91,6 @@ def insert_user_embeddings():
     conn.close()
 
 if __name__ == '__main__':
+    # create_multiple_users(n=532)
+    # create_user_via_profile()
     insert_user_embeddings()
