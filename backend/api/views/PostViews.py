@@ -253,7 +253,6 @@ class PostViewSet(viewsets.ModelViewSet):
             logging.error(f"Error updating user embedding: {e}")
             return False
 
-
 # @api_view(["GET"])
 # @permission_classes([IsAuthenticated])
 # def get_presigned_url(request):

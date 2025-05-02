@@ -42,6 +42,16 @@ class FollowerViewSet(viewsets.ModelViewSet):
         """Set the user field to the authenticated user before saving."""
         serializer.save(user=self.request.user)
 
+class CountryViewSet(viewsets.ModelViewSet):
+    queryset = Country.objects.all()
+    serializer_class = CountrySerializer
+    # permission_classes = [IsAuthenticated, IsAdminUser]
+    permission_classes = [AllowAny]
+
+    def list(self, request, *args, **kwargs):
+        """Return a list of country names for the frontend dropdown."""
+        countries = Country.objects.values_list("name", flat=True)
+        return Response({"countries": list(countries)})
 
 class ProfileViewSet(viewsets.ModelViewSet):
     queryset = Profile.objects.all()
@@ -63,6 +73,7 @@ class UserView(APIView):
     def get(self, request, user_id=None):
         """Allow users to view any user profile by ID"""
         try:
+            user_id = request.GET.get('id')
             if user_id:
                 user = User.objects.get(id=user_id)
             else:
