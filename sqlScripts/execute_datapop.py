@@ -26,7 +26,7 @@ def execute_datapop(script_name):
     
     # Execute the script using subprocess
     try:
-        result = subprocess.run(['python ', script_path], check=True, capture_output=True, text=True)
+        result = subprocess.run(['python3', script_path], check=True, capture_output=True, text=True)
         logging.info("Script executed successfully.")
         logging.info(result.stdout)
     except subprocess.CalledProcessError as e:
@@ -39,11 +39,11 @@ if __name__ == "__main__":
     # execute_datapop('sqlScripts/pyscripts/countries_script.py')    
     
     # Execution
-    # execute_datapop('./pyscripts/itemtypes_script.py')
-    # execute_datapop('./pyscripts/genres_script.py')
+    execute_datapop('/home/nd191/share_community/sqlScripts/pyscripts/itemtypes_script.py')
+    execute_datapop('/home/nd191/share_community/sqlScripts/pyscripts/genres_script.py')
 
-    execute_datapop('./pyscripts/audio_script.py')
-    execute_datapop('./pyscripts/books_script.py')
-    execute_datapop('./pyscripts/movies_script.py')
-    execute_datapop('./pyscripts/uploadEmbeddings.py')
+    execute_datapop('/home/nd191/share_community/sqlScripts/pyscripts/audio_script.py')
+    execute_datapop('/home/nd191/share_community/sqlScripts/pyscripts/books_script.py')
+    execute_datapop('/home/nd191/share_community/sqlScripts/pyscripts/movies_script.py')
+    execute_datapop('/home/nd191/share_community/sqlScripts/pyscripts/uploadEmbeddings.py')
     

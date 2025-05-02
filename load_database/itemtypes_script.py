@@ -2,10 +2,6 @@ import requests
 
 # Configuration
 API_BASE_URL = "http://localhost:8001/api"  # Base API URL
-# API_BASE_URL = "https://3fad-152-3-43-40.ngrok-free.app/api"  # Base API URL
-
-
-
 LOGIN_ENDPOINT = f"{API_BASE_URL}/login/"  # Login endpoint
 ITEMTYPE_ENDPOINT = f"{API_BASE_URL}/itemtypes/"  # Itemtypes endpoint
 
