@@ -1,8 +1,7 @@
-## COMPSCI 516 - Database Systems Final Project  
-### Milestone 2  
-
-**Team Name:** Slice of Culture  
+Slice of Culture  
 **Name:** Alejandro Paredes La Torre, Ilseop Lee, Nakiyah Dhariwala, Nruta Choudhari, Rishika Randev
+
+![alt text](SocialMedia%20APP.JPG)
 
 ## Project Overview  
 This is a social platform that allows users to share and explore content they have recently consumed, such as movies, books, and music. The platform provides a recommendation system based on collaborative filtering and enables users to engage with each other through forum discussions.  
